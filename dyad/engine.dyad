@@ -1,0 +1,37 @@
+"short engine component description"
+component engine
+  delay = BlockComponents.Nonlinear.PadeDelay(n = 6, m = 5, delayTime = 0.3) {^delay}
+  lag = BlockComponents.Continuous.FirstOrder(T = 0.3) {^lag}
+relations
+  connect(delay.y, lag.u) {^id3}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "delay": {
+      "Dyad": {"placement": {"diagram": {"x1": 370, "x2": 470, "y1": 420, "y2": 520}}}
+    },
+    "lag": {
+      "Dyad": {"placement": {"diagram": {"x1": 620, "x2": 720, "y1": 420, "y2": 520}}}
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}}
+  }
+}
+end
