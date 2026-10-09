@@ -53,18 +53,18 @@ short EngineStep component description
   __constants = Any[]
 
   ### Components
-  # Subcomponent engine of type MyCar.engine
-  engine_overrides = __pop_subcomponent_overrides!(__overrides, "engine")
-  push!(__systems, @named engine = MyCar.engine(; engine_overrides...))
   # Subcomponent cmd of type BlockComponents.Sources.Step
   cmd_overrides = __pop_subcomponent_overrides!(__overrides, "cmd")
-  push!(__systems, @named cmd = BlockComponents.Sources.Step(; height=Float64(200), start_time=0.5, offset=Float64(0), cmd_overrides...))
-  # Subcomponent mounts of type RotationalComponents.Components.Fixed
-  mounts_overrides = __pop_subcomponent_overrides!(__overrides, "mounts")
-  push!(__systems, @named mounts = RotationalComponents.Components.Fixed(; mounts_overrides...))
+  push!(__systems, @named cmd = BlockComponents.Sources.Step(; height=Float64(200), offset=Float64(0), start_time=0.5, cmd_overrides...))
+  # Subcomponent engine of type MyCar.Engine
+  engine_overrides = __pop_subcomponent_overrides!(__overrides, "engine")
+  push!(__systems, @named engine = MyCar.Engine(; engine_overrides...))
   # Subcomponent load of type RotationalComponents.Components.Inertia
   load_overrides = __pop_subcomponent_overrides!(__overrides, "load")
   push!(__systems, @named load = RotationalComponents.Components.Inertia(; J=Float64(1), load_overrides...))
+  # Subcomponent mounts of type RotationalComponents.Components.Fixed
+  mounts_overrides = __pop_subcomponent_overrides!(__overrides, "mounts")
+  push!(__systems, @named mounts = RotationalComponents.Components.Fixed(; mounts_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))

@@ -5,9 +5,9 @@
 
 
 @doc Markdown.doc"""
-   engine(; name, theta_e, tau_e, T_max)
+   Engine(; name, theta_e, tau_e, T_max)
 
-short engine component description
+short Engine component description
 
 ## Parameters:
 
@@ -19,16 +19,16 @@ short engine component description
 
 ## Connectors
 
+ * `tau_cmd` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
  * `spline` - This connector represents a rotational spline with angle and torque as the potential and flow variables, respectively. ([`Spline`](@ref))
  * `support` - This connector represents a rotational spline with angle and torque as the potential and flow variables, respectively. ([`Spline`](@ref))
- * `tau_cmd` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
 """
-@component function engine(; name = nothing, theta_e=0.3, tau_e=0.3, T_max=Float64(150), kwargs...)
+@component function Engine(; name = nothing, theta_e=0.3, tau_e=0.3, T_max=Float64(150), kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
   
-    @named model = engine()
+    @named model = Engine()
   """))
 
   __overrides = __build_overrides(kwargs)
@@ -54,9 +54,6 @@ short engine component description
   ### Deferred assignment (default values that depend on final parameters)
 
   ### Symbolic Parameters
-  __local__theta_e = theta_e
-  append!(__params, @parameters (theta_e::Real), [description = "Injection-to-torque transport delay"])
-  __initial_conditions[theta_e] = __local__theta_e
   __local__tau_e = tau_e
   append!(__params, @parameters (tau_e::Real), [description = "Manifold-filling first-order lag"])
   __initial_conditions[tau_e] = __local__tau_e
@@ -103,14 +100,14 @@ short engine component description
   __assertions = []
 
   ### Equations
+  push!(__eqs, connect(tau_cmd, delay.u))
   push!(__eqs, connect(delay.y, lag.u))
   push!(__eqs, connect(lag.y, limiter.u))
   push!(__eqs, connect(limiter.y, torque.tau))
   push!(__eqs, connect(torque.spline, spline))
   push!(__eqs, connect(torque.support, support))
-  push!(__eqs, connect(tau_cmd, delay.u))
 
   # Return completely constructed System
   return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
 end
-export engine
+export Engine
