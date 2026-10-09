@@ -199,7 +199,10 @@ component.
 end
 
 
+include("Body_definition.jl")
 include("Driveline_definition.jl")
 include("EngineStepTransient_definition.jl")
 include("EngineStep_definition.jl")
 include("Engine_definition.jl")
+include("TestDrivelineAnalysis_definition.jl")
+include("TestDriveline_definition.jl")

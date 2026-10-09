@@ -13,7 +13,7 @@ short Driveline component description
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
-| `i`         | Gear ratio                         | --  |   4 |
+| `i`         | Gear ratio                         | --  |   4.0 |
 | `r`         | Wheel rolling radius                         | m  |   0.31 |
 
 ## Connectors
@@ -23,7 +23,7 @@ short Driveline component description
  * `flange` - This connector represents a mechanical flange with position and force as the potential and flow variables, respectively. ([`Flange`](@ref))
  * `support_t` - This connector represents a mechanical flange with position and force as the potential and flow variables, respectively. ([`Flange`](@ref))
 """
-@component function Driveline(; name = nothing, i=Float64(4), r=0.31, kwargs...)
+@component function Driveline(; name = nothing, i=Float64(4.0), r=0.31, kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -79,10 +79,10 @@ short Driveline component description
   push!(__systems, @named support_t = __Dyad__Flange())
   # Subcomponent gear of type RotationalComponents.Components.IdealGear
   gear_overrides = __pop_subcomponent_overrides!(__overrides, "gear")
-  push!(__systems, @named gear = RotationalComponents.Components.IdealGear(; gear_overrides...))
+  push!(__systems, @named gear = RotationalComponents.Components.IdealGear(; ratio=i, gear_overrides...))
   # Subcomponent wheel of type RotationalComponents.Components.IdealRollingWheel
   wheel_overrides = __pop_subcomponent_overrides!(__overrides, "wheel")
-  push!(__systems, @named wheel = RotationalComponents.Components.IdealRollingWheel(; wheel_overrides...))
+  push!(__systems, @named wheel = RotationalComponents.Components.IdealRollingWheel(; radius=r, wheel_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
@@ -97,10 +97,10 @@ short Driveline component description
   ### Equations
   push!(__eqs, connect(spline, gear.spline_a))
   push!(__eqs, connect(gear.spline_b, wheel.spline))
-  push!(__eqs, connect(wheel.support_r, support_r))
-  push!(__eqs, connect(wheel.support_t, support_t))
   push!(__eqs, connect(wheel.flange, flange))
   push!(__eqs, connect(gear.support, support_r))
+  push!(__eqs, connect(wheel.support_r, support_r))
+  push!(__eqs, connect(wheel.support_t, support_t))
 
   # Return completely constructed System
   return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
