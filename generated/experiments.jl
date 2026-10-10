@@ -10,7 +10,10 @@ end
 
 
 include("Body_experiment.jl")
+include("CarFullThrottle_experiment.jl")
+include("Car_experiment.jl")
 include("Driveline_experiment.jl")
 include("EngineStep_experiment.jl")
 include("Engine_experiment.jl")
+include("TestBody_experiment.jl")
 include("TestDriveline_experiment.jl")

@@ -200,9 +200,14 @@ end
 
 
 include("Body_definition.jl")
+include("CarFullThrottleTransient_definition.jl")
+include("CarFullThrottle_definition.jl")
+include("Car_definition.jl")
 include("Driveline_definition.jl")
 include("EngineStepTransient_definition.jl")
 include("EngineStep_definition.jl")
 include("Engine_definition.jl")
+include("TestBodyAnalysis_definition.jl")
+include("TestBody_definition.jl")
 include("TestDrivelineAnalysis_definition.jl")
 include("TestDriveline_definition.jl")

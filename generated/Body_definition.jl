@@ -92,7 +92,7 @@ short Body component description
   push!(__systems, @named mass = TranslationalComponents.Components.Mass(; m=m, mass_overrides...))
   # Subcomponent cr_const of type BlockComponents.Sources.Constant
   cr_const_overrides = __pop_subcomponent_overrides!(__overrides, "cr_const")
-  push!(__systems, @named cr_const = BlockComponents.Sources.Constant(; cr_const_overrides...))
+  push!(__systems, @named cr_const = BlockComponents.Sources.Constant(; k=f_r, cr_const_overrides...))
   # Subcomponent rolling of type TranslationalComponents.Components.RollingResistance
   rolling_overrides = __pop_subcomponent_overrides!(__overrides, "rolling")
   push!(__systems, @named rolling = TranslationalComponents.Components.RollingResistance(; fWeight=m * g, rolling_overrides...))
