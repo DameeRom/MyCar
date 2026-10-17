@@ -9,7 +9,7 @@ component TireFrictionCurve
   "Slip ratio at the sliding plateau"
   parameter sSlide::Real = 0.12
   "Peak adhesion coefficient"
-  parameter mu_A::Real = 1.0
+  parameter mu_A::Real = 1
   "Sliding friction coefficient"
   parameter mu_S::Real = 0.7
   "Slip magnitude"

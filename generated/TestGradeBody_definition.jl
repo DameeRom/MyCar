@@ -70,8 +70,6 @@
   ### Guesses
 
   ### Initialization Equations
-  push!(__initialization_eqs, body.mass.s ~ 0)
-  push!(__initialization_eqs, body.mass.v ~ 0)
 
   ### Assertions
   __assertions = []

@@ -15,7 +15,7 @@ short TireFrictionCurve component description
 | ------------ | ----------------------------------- | ------ | --------------- |
 | `sAdhesion`         | Slip ratio at peak adhesion                         | --  |   0.04 |
 | `sSlide`         | Slip ratio at the sliding plateau                         | --  |   0.12 |
-| `mu_A`         | Peak adhesion coefficient                         | --  |   1.0 |
+| `mu_A`         | Peak adhesion coefficient                         | --  |   1 |
 | `mu_S`         | Sliding friction coefficient                         | --  |   0.7 |
 
 ## Connectors
@@ -30,7 +30,7 @@ short TireFrictionCurve component description
 | `slip`         | Slip magnitude                         | --  |
 | `mu_abs`         | Friction magnitude                         | --  |
 """
-@component function TireFrictionCurve(; name = nothing, sAdhesion=0.04, sSlide=0.12, mu_A=Float64(1.0), mu_S=0.7, kwargs...)
+@component function TireFrictionCurve(; name = nothing, sAdhesion=0.04, sSlide=0.12, mu_A=Float64(1), mu_S=0.7, kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
