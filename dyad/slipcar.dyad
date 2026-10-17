@@ -1,0 +1,172 @@
+"short SlipCar component description"
+component SlipCar
+  "Commanded engine torque"
+  tau_cmd = RealInput() {^tau_cmd}
+  "Road gradient, tan(alpha)"
+  grade = RealInput() {^grade}
+  "Road-friction multiplier"
+  mu_scale = RealInput() {^mu_scale}
+  "Vehicle speed in km/h"
+  v_kmh = RealOutput() {^v_kmh}
+  "Wheel surface speed, omega * radius, in km/h"
+  wheel_kmh = RealOutput() {^wheel_kmh}
+  engine = Engine(theta_e = theta_e, T_max = T_max) {^engine}
+  gear = RotationalComponents.Components.IdealGear(ratio = i) {^gear}
+  wheel_inertia = RotationalComponents.Components.Inertia(J = J_w) {^wheel_inertia}
+  wheel = SlipWheel1D(radius = r, F_z = m * g / 2) {^wheel}
+  body = GradeBody(m = m, CdA = CdA, g = g) {^body}
+  vsensor = TranslationalComponents.Sensors.VelocitySensor() {^vsensor}
+  to_kmh = BlockComponents.Math.Gain(k = 3.6) {^to_kmh}
+  wsensor = RotationalComponents.Sensors.VelocitySensor() {^wsensor}
+  wheel_to_kmh = BlockComponents.Math.Gain(k = r * 3.6) {^wheel_to_kmh}
+  "Engine mounts and gearbox housing"
+  rot_ground = RotationalComponents.Components.Fixed() {^rot_ground}
+  "Injection-to-torque transport delay"
+  structural parameter theta_e::Time = 0.3
+  "Peak deliverable torque"
+  parameter T_max::Torque = 150
+  "Gear ratio"
+  parameter i::Real = 4.0
+  "Road wheel and tire inertia"
+  parameter J_w::MomentOfInertia = 1.0
+  "Wheel rolling radius, shared by the tire and the wheel-speed gain"
+  parameter r::Length = 0.31
+  "Vehicle mass; the driven axle carries half of it"
+  parameter m::Dyad.Mass = 1400
+  "Aerodynamic drag area, Cd * A"
+  parameter CdA::Area = 0.63
+  "Gravitational acceleration"
+  parameter g::Acceleration = 9.80665
+relations
+  connect(grade, body.grade) {^id16}
+  connect(mu_scale, wheel.mu_scale) {^id17}
+  connect(tau_cmd, engine.tau_cmd) {^id18}
+  connect(engine.support, rot_ground.spline, gear.support) {^id19}
+  connect(engine.spline, gear.spline_a) {^id20}
+  connect(gear.spline_b, wheel_inertia.spline_a) {^id21}
+  connect(wheel_inertia.spline_b, wheel.spline, wsensor.spline) {^id22}
+  connect(wsensor.w, wheel_to_kmh.u) {^id23}
+  connect(wheel_to_kmh.y, wheel_kmh) {^id24}
+  connect(wheel.flange, body.flange, vsensor.flange) {^id25}
+  connect(vsensor.v, to_kmh.u) {^id26}
+  connect(to_kmh.y, v_kmh) {^id27}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "tau_cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 710, "y2": 810}}}
+    },
+    "grade": {"Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 80, "y2": 180}}}},
+    "mu_scale": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 250, "y2": 350}}}
+    },
+    "v_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 970, "x2": 1070, "y1": 560, "y2": 660}}}
+    },
+    "wheel_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 970, "x2": 1070, "y1": 750, "y2": 850}}}
+    },
+    "engine": {
+      "Dyad": {"placement": {"diagram": {"x1": 30, "x2": 130, "y1": 450, "y2": 550}}}
+    },
+    "gear": {
+      "Dyad": {"placement": {"diagram": {"x1": 180, "x2": 280, "y1": 450, "y2": 550}}}
+    },
+    "wheel_inertia": {
+      "Dyad": {"placement": {"diagram": {"x1": 350, "x2": 450, "y1": 450, "y2": 550}}}
+    },
+    "wheel": {
+      "Dyad": {"placement": {"diagram": {"x1": 520, "x2": 620, "y1": 450, "y2": 550}}}
+    },
+    "body": {
+      "Dyad": {"placement": {"diagram": {"x1": 830, "x2": 930, "y1": 270, "y2": 370}}}
+    },
+    "vsensor": {
+      "Dyad": {"placement": {"diagram": {"x1": 690, "x2": 790, "y1": 560, "y2": 660}}}
+    },
+    "to_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 820, "x2": 920, "y1": 560, "y2": 660}}}
+    },
+    "wsensor": {
+      "Dyad": {"placement": {"diagram": {"x1": 690, "x2": 790, "y1": 750, "y2": 850}}}
+    },
+    "wheel_to_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 830, "x2": 930, "y1": 750, "y2": 850}}}
+    },
+    "rot_ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 180, "x2": 280, "y1": 680, "y2": 780}}}
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 670, "y": 130}, {"x": 670, "y": 319.3333333333333}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 570, "y": 300}], "E": 2}], "path": {}}},
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 10, "y": 500}], "E": 2}], "path": {}}},
+    "id19": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 80, "y": 615}], "E": -1},
+          {"S": -1, "M": [{"x": 230, "y": 615}], "E": 2},
+          {"S": 3, "M": [], "E": -1}
+        ],
+        "junctions": [{"x": 230, "y": 615}],
+        "path": {}
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id21": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id22": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": 3, "M": [{"x": 480, "y": 800}], "E": -1}
+        ],
+        "junctions": [{"x": 480, "y": 500}],
+        "path": {}
+      }
+    },
+    "id23": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id24": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id25": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 960, "y": 500}, {"x": 960, "y": 320}], "E": 2},
+          {"S": 3, "M": [{"x": 660, "y": 610}], "E": -1}
+        ],
+        "junctions": [{"x": 660, "y": 500}],
+        "path": {}
+      }
+    },
+    "id26": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id27": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}}
+  }
+}
+end
