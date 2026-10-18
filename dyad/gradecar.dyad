@@ -1,0 +1,121 @@
+"short Car component description"
+component GradeCar
+  tau_cmd = Dyad.RealInput() {^tau_cmd}
+  engine = MyCar.Engine() {^engine}
+  driveline = MyCar.Driveline() {^driveline}
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  fixed1 = TranslationalComponents.Components.Fixed() {^fixed1}
+  vsensor = TranslationalComponents.Sensors.VelocitySensor() {^vsensor}
+  gain = BlockComponents.Math.Gain(k = 3.6) {^gain}
+  v_kmh = Dyad.RealOutput() {^v_kmh}
+  body = MyCar.GradeBody() {^body}
+  grade = Dyad.RealInput() {^grade}
+relations
+  connect(tau_cmd, engine.tau_cmd) {^id11}
+  connect(engine.spline, driveline.spline) {^id12}
+  connect(driveline.support_t, fixed1.flange) {^id13}
+  connect(engine.support, fixed.spline, driveline.support_r) {^id14}
+  connect(vsensor.flange, driveline.flange, body.flange) {^id15}
+  connect(vsensor.v, gain.u) {^id16}
+  connect(v_kmh, gain.y) {^id17}
+  connect(body.grade, grade) {^id18}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "tau_cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": -30, "x2": 50, "y1": 460, "y2": 540}}}
+    },
+    "engine": {
+      "Dyad": {"placement": {"diagram": {"x1": 120, "x2": 220, "y1": 450, "y2": 550}}}
+    },
+    "driveline": {
+      "Dyad": {"placement": {"diagram": {"x1": 310, "x2": 410, "y1": 450, "y2": 550}}}
+    },
+    "fixed": {
+      "Dyad": {"placement": {"diagram": {"x1": 140, "x2": 240, "y1": 720, "y2": 820}}}
+    },
+    "fixed1": {
+      "Dyad": {"placement": {"diagram": {"x1": 380, "x2": 480, "y1": 720, "y2": 820}}}
+    },
+    "vsensor": {
+      "Dyad": {"placement": {"diagram": {"x1": 710, "x2": 810, "y1": 290, "y2": 390}}}
+    },
+    "gain": {
+      "Dyad": {"placement": {"diagram": {"x1": 850, "x2": 950, "y1": 290, "y2": 390}}}
+    },
+    "v_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 970, "x2": 1050, "y1": 460, "y2": 540}}}
+    },
+    "body": {
+      "Dyad": {"placement": {"diagram": {"x1": 690, "x2": 790, "y1": 450, "y2": 550}}}
+    },
+    "grade": {
+      "Dyad": {"placement": {"diagram": {"x1": -40, "x2": 40, "y1": 870, "y2": 950}}}
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 371, "y": 635}, {"x": 430, "y": 635}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 170, "y": 635}], "E": -1},
+          {"S": -1, "M": [{"x": 190, "y": 635}], "E": 2},
+          {"S": 3, "M": [{"x": 348, "y": 592.5}, {"x": 190, "y": 592.5}], "E": -1}
+        ],
+        "junctions": [{"x": 190, "y": 635}],
+        "path": {}
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 560, "y": 340}], "E": -1},
+          {"S": -1, "M": [{"x": 560, "y": 500}], "E": 2},
+          {"S": 3, "M": [{"x": 810, "y": 500}, {"x": 810, "y": 430}], "E": -1}
+        ],
+        "junctions": [{"x": 560, "y": 430}],
+        "path": {}
+      }
+    },
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id17": {
+      "Dyad": {"edges": [{"S": 1, "M": [{"x": 1010, "y": 340}], "E": 2}], "path": {}}
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 650, "y": 499.3333333333333}, {"x": 650, "y": 870}, {"x": 0, "y": 870}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    }
+  }
+}
+end

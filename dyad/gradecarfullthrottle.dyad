@@ -1,0 +1,51 @@
+"short CarFullThrottle component description"
+component GradeCarFullThrottle
+  cmd = BlockComponents.Sources.Constant(k = 150) {^cmd}
+  constant1 = BlockComponents.Sources.Constant(k = 0.1) {^constant1}
+  car = MyCar.GradeCar() {^car}
+relations
+  initial car.body.mass.s = 0
+  initial car.body.mass.v = 0
+  initial car.engine.lag.x = 0
+  connect(cmd.y, car.tau_cmd) {^id4}
+  connect(constant1.y, car.grade) {^id5}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 450, "y2": 550}}}
+    },
+    "constant1": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 630, "y2": 730}}}
+    },
+    "car": {
+      "Dyad": {"placement": {"diagram": {"x1": 290, "x2": 390, "y1": 450, "y2": 550}}}
+    },
+    "id4": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 172.5, "y": 680}, {"x": 172.5, "y": 541}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end
