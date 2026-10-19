@@ -4,7 +4,7 @@ component GradeBody
   flange = Flange() {^flange}
   "Road gradient, tan(alpha)"
   grade = RealInput() {^grade}
-  mass = TranslationalComponents.Components.Mass(m = m, s = initial 0, v = initial 0) {^mass}
+  mass = TranslationalComponents.Components.Mass(m = m) {^mass}
   drag = TranslationalComponents.Sources.QuadraticSpeedDependentForce(ForceDirection = false, v_nominal = v_nominal, f_nominal = -0.5 * rho * CdA * v_nominal ^ 2) {^drag}
   rolling = TranslationalComponents.Components.RollingResistance(fWeight = m * g) {^rolling}
   cr_const = BlockComponents.Sources.Constant(k = f_r) {^cr_const}
@@ -126,7 +126,7 @@ test component TestGradeBody
   "500 N of traction, on the flat or on a climb"
   tractive = TranslationalComponents.Sources.ConstantForce(f_constant = 500) {^tractive}
   road = BlockComponents.Sources.Constant(k = 0) {^road}
-  body = GradeBody() {^body}
+  body = GradeBody(mass(s(initial = 0), v(initial = 0))) {^body}
   fixed = TranslationalComponents.Components.Fixed() {^fixed}
 relations
   connect(tractive.flange, body.flange) {^id1}

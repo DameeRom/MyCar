@@ -91,7 +91,7 @@ short GradeBody component description
   push!(__systems, @named flange = __Dyad__Flange())
   # Subcomponent mass of type TranslationalComponents.Components.Mass
   mass_overrides = __pop_subcomponent_overrides!(__overrides, "mass")
-  push!(__systems, @named mass = TranslationalComponents.Components.Mass(; m=m, s__initial=0, v__initial=0, mass_overrides...))
+  push!(__systems, @named mass = TranslationalComponents.Components.Mass(; m=m, mass_overrides...))
   # Subcomponent drag of type TranslationalComponents.Sources.QuadraticSpeedDependentForce
   drag_overrides = __pop_subcomponent_overrides!(__overrides, "drag")
   push!(__systems, @named drag = TranslationalComponents.Sources.QuadraticSpeedDependentForce(; ForceDirection=false, v_nominal=v_nominal, f_nominal=-0.5 * rho * CdA * v_nominal ^ 2, drag_overrides...))

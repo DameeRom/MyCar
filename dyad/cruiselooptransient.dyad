@@ -3,6 +3,9 @@ analysis CruiseLoopTransient
   extends Dyad.TransientAnalysis(stop = 100)
   model = MyCar.CruiseLoopStep()
 relations
+  initial model.plant.body.mass.s = 0
+  initial model.plant.body.mass.v = 0
+  initial model.plant.engine.lag.x = 0
 metadata {
   "Dyad": {
     "experiments": {},

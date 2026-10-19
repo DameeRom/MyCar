@@ -5,17 +5,11 @@
 
 
 @doc Markdown.doc"""
-   CruiseLoopStep(; name, k)
+   CruiseLoopStep(; name)
 
 short CruiseLoopStep component description
-
-## Parameters:
-
-| Name         | Description                         | Units  |   Default value |
-| ------------ | ----------------------------------- | ------ | --------------- |
-| `k`         | proportional gain                         | --  |   14 |
 """
-@component function CruiseLoopStep(; name = nothing, k=Float64(14), kwargs...)
+@component function CruiseLoopStep(; name = nothing, kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -46,9 +40,6 @@ short CruiseLoopStep component description
   ### Deferred assignment (default values that depend on final parameters)
 
   ### Symbolic Parameters
-  __local__k = k
-  append!(__params, @parameters (k::Real), [description = "proportional gain"])
-  __initial_conditions[k] = __local__k
 
   ### Final Parameters (assignments)
 
@@ -65,15 +56,15 @@ short CruiseLoopStep component description
   # Subcomponent demand of type BlockComponents.Sources.Step
   demand_overrides = __pop_subcomponent_overrides!(__overrides, "demand")
   push!(__systems, @named demand = BlockComponents.Sources.Step(; offset=Float64(90), height=Float64(20), start_time=Float64(0), demand_overrides...))
+  # Subcomponent controller of type MyCar.CruiseController
+  controller_overrides = __pop_subcomponent_overrides!(__overrides, "controller")
+  push!(__systems, @named controller = MyCar.CruiseController(; y_max=Float64(150), y_min=Float64(0), controller_overrides...))
   # Subcomponent plant of type MyCar.GradeCar
   plant_overrides = __pop_subcomponent_overrides!(__overrides, "plant")
   push!(__systems, @named plant = MyCar.GradeCar(; plant_overrides...))
   # Subcomponent road of type BlockComponents.Sources.Constant
   road_overrides = __pop_subcomponent_overrides!(__overrides, "road")
   push!(__systems, @named road = BlockComponents.Sources.Constant(; k=Float64(0), road_overrides...))
-  # Subcomponent controller of type MyCar.CruiseController
-  controller_overrides = __pop_subcomponent_overrides!(__overrides, "controller")
-  push!(__systems, @named controller = MyCar.CruiseController(; k=k, controller_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
@@ -82,16 +73,16 @@ short CruiseLoopStep component description
 
   ### Initialization Equations
   push!(__initialization_eqs, plant.body.mass.s ~ 0)
-  push!(__initialization_eqs, plant.body.mass.v ~ 0)
-  push!(__initialization_eqs, plant.engine.lag.x ~ 0)
+  push!(__initialization_eqs, plant.body.mass.v ~ 25)
+  push!(__initialization_eqs, plant.engine.lag.x ~ 31.078)
 
   ### Assertions
   __assertions = []
 
   ### Equations
-  push!(__eqs, connect(road.y, plant.grade))
   push!(__eqs, connect(controller.y, plant.tau_cmd))
   push!(__eqs, connect(plant.v_kmh, controller.u_m))
+  push!(__eqs, connect(road.y, plant.grade))
   push!(__eqs, connect(demand.y, controller.u_s))
 
   # Return completely constructed System

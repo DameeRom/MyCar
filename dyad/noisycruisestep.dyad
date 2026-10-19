@@ -1,0 +1,81 @@
+"short CruiseLoopStep component description"
+component NoisyCruiseStep
+  demand = BlockComponents.Sources.Step(offset = 90, height = 20, start_time = 0) {^demand}
+  controller = MyCar.CruiseController(y_max = 1e6, y_min = -1e6, wd = 0, Nd = 100) {^controller}
+  plant = MyCar.GradeCar(T_max = 1e6) {^plant}
+  road = BlockComponents.Sources.Constant(k = 0) {^road}
+  noise = MyCar.MeasurementNoise() {^noise}
+relations
+  connect(controller.y, plant.tau_cmd) {^id6}
+  initial plant.body.mass.s = 0
+  initial plant.body.mass.v = 25
+  initial plant.engine.lag.x = 31.078
+  connect(plant.grade, road.y) {^id7}
+  connect(demand.y, controller.u_s) {^id8}
+  connect(plant.v_kmh, noise.u) {^id9}
+  connect(noise.y, controller.u_m) {^id10}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "demand": {
+      "Dyad": {"placement": {"diagram": {"x1": 130, "x2": 230, "y1": 210, "y2": 310}}}
+    },
+    "controller": {
+      "Dyad": {"placement": {"diagram": {"x1": 360, "x2": 460, "y1": 220, "y2": 320}}}
+    },
+    "plant": {
+      "Dyad": {"placement": {"diagram": {"x1": 650, "x2": 750, "y1": 220, "y2": 320}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 480, "x2": 580, "y1": 350, "y2": 450}}}
+    },
+    "noise": {
+      "Dyad": {"placement": {"diagram": {"x1": 840, "x2": 940, "y1": 220, "y2": 320}}}
+    },
+    "id6": {},
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 630, "y": 311}, {"x": 630, "y": 400}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 298, "y": 260}, {"x": 298, "y": 253}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 1030, "y": 270}, {"x": 1030, "y": 540}, {"x": 377, "y": 540}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    }
+  }
+}
+end

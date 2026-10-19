@@ -5,9 +5,15 @@
 
 
 @doc Markdown.doc"""
-   GradeCar(; name)
+   GradeCar(; name, T_max)
 
 short Car component description
+
+## Parameters:
+
+| Name         | Description                         | Units  |   Default value |
+| ------------ | ----------------------------------- | ------ | --------------- |
+| `T_max`         |                          | N.m  |   150 |
 
 ## Connectors
 
@@ -15,7 +21,7 @@ short Car component description
  * `v_kmh` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
  * `grade` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
 """
-@component function GradeCar(; name = nothing, kwargs...)
+@component function GradeCar(; name = nothing, T_max=Float64(150), kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -46,6 +52,9 @@ short Car component description
   ### Deferred assignment (default values that depend on final parameters)
 
   ### Symbolic Parameters
+  __local__T_max = T_max
+  append!(__params, @parameters (T_max::Real))
+  __initial_conditions[T_max] = __local__T_max
 
   ### Final Parameters (assignments)
 
@@ -64,7 +73,7 @@ short Car component description
   ### Components
   # Subcomponent engine of type MyCar.Engine
   engine_overrides = __pop_subcomponent_overrides!(__overrides, "engine")
-  push!(__systems, @named engine = MyCar.Engine(; engine_overrides...))
+  push!(__systems, @named engine = MyCar.Engine(; T_max=T_max, engine_overrides...))
   # Subcomponent driveline of type MyCar.Driveline
   driveline_overrides = __pop_subcomponent_overrides!(__overrides, "driveline")
   push!(__systems, @named driveline = MyCar.Driveline(; driveline_overrides...))

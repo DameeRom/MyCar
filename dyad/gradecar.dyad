@@ -1,7 +1,7 @@
 "short Car component description"
 component GradeCar
   tau_cmd = Dyad.RealInput() {^tau_cmd}
-  engine = MyCar.Engine() {^engine}
+  engine = MyCar.Engine(T_max = T_max) {^engine}
   driveline = MyCar.Driveline() {^driveline}
   fixed = RotationalComponents.Components.Fixed() {^fixed}
   fixed1 = TranslationalComponents.Components.Fixed() {^fixed1}
@@ -10,6 +10,7 @@ component GradeCar
   v_kmh = Dyad.RealOutput() {^v_kmh}
   body = MyCar.GradeBody() {^body}
   grade = Dyad.RealInput() {^grade}
+  parameter T_max::Torque() = 150
 relations
   connect(tau_cmd, engine.tau_cmd) {^id11}
   connect(engine.spline, driveline.spline) {^id12}

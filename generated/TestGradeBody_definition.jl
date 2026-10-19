@@ -59,7 +59,7 @@
   push!(__systems, @named road = BlockComponents.Sources.Constant(; k=Float64(0), road_overrides...))
   # Subcomponent body of type MyCar.GradeBody
   body_overrides = __pop_subcomponent_overrides!(__overrides, "body")
-  push!(__systems, @named body = MyCar.GradeBody(; body_overrides...))
+  push!(__systems, @named body = MyCar.GradeBody(; mass__s__initial=0, mass__v__initial=0, body_overrides...))
   # Subcomponent fixed of type TranslationalComponents.Components.Fixed
   fixed_overrides = __pop_subcomponent_overrides!(__overrides, "fixed")
   push!(__systems, @named fixed = TranslationalComponents.Components.Fixed(; fixed_overrides...))

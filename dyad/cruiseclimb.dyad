@@ -1,0 +1,75 @@
+"short CruiseLoopStep component description"
+component CruiseClimb
+  demand = BlockComponents.Sources.Constant(k = 130) {^demand}
+  controller = CruiseController(y_max = 150, y_min = 0, xd0 = -130) {^controller}
+  plant = GradeCar() {^plant}
+  road = BlockComponents.Sources.Pulse(amplitude = 0.10, offset = 0, start_time = 30, duty_cycle = 1.0, period = 120) {^road}
+relations
+  connect(controller.y, plant.tau_cmd) {^id5}
+  initial plant.body.mass.s = 0
+  initial plant.body.mass.v = 36.111111111111114
+  initial plant.engine.lag.x = 50.9693
+  connect(demand.y, controller.u_s) {^id6}
+  connect(plant.v_kmh, controller.u_m) {^id7}
+  connect(road.y, plant.grade) {^id8}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "demand": {
+      "Dyad": {"placement": {"diagram": {"x1": 140, "x2": 240, "y1": 210, "y2": 310}}}
+    },
+    "controller": {
+      "Dyad": {"placement": {"diagram": {"x1": 360, "x2": 460, "y1": 220, "y2": 320}}}
+    },
+    "plant": {
+      "Dyad": {"placement": {"diagram": {"x1": 650, "x2": 750, "y1": 220, "y2": 320}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 440, "x2": 540, "y1": 490, "y2": 590}}}
+    },
+    "id5": {},
+    "id6": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 303, "y": 260}, {"x": 303, "y": 253}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 810, "y": 270}, {"x": 810, "y": 360}, {"x": 377, "y": 360}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 597.5, "y": 540}, {"x": 597.5, "y": 311}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end
