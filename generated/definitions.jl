@@ -15,7 +15,12 @@ if isfile(joinpath((@__DIR__) |> Base.dirname, "dyad", "definitions.jl"))
   include(joinpath((@__DIR__) |> Base.dirname, "dyad", "definitions.jl"))
 end
 
+import BlockComponents
+import DyadData
 import DyadInterface
+import RotationalComponents
+import ThermalComponents
+import TranslationalComponents
 @doc Markdown.doc"""
 This connector represents an electrical pin with voltage and current as the potential and flow variables, respectively.
 """
@@ -194,5 +199,51 @@ component.
 end
 
 
-include("Hello_definition.jl")
-include("World_definition.jl")
+include("Body_definition.jl")
+include("CarFullThrottleTransient_definition.jl")
+include("CarFullThrottle_definition.jl")
+include("CarStepTestTransient_definition.jl")
+include("CarStepTest_definition.jl")
+include("Car_definition.jl")
+include("CruiseClimbTransient_definition.jl")
+include("CruiseClimb_definition.jl")
+include("CruiseController_definition.jl")
+include("CruiseLoopStep_definition.jl")
+include("CruiseLoopTransient_definition.jl")
+include("Driveline_definition.jl")
+include("EngineStepTransient_definition.jl")
+include("EngineStep_definition.jl")
+include("Engine_definition.jl")
+include("GradeBody_definition.jl")
+include("GradeCarFullThrottleTransient_definition.jl")
+include("GradeCarFullThrottle_definition.jl")
+include("GradeCar_definition.jl")
+include("GradeForce_definition.jl")
+include("MeasurementNoise_definition.jl")
+include("NoisyCruiseStep_definition.jl")
+include("NoisyCruiseTransient_definition.jl")
+include("SlipCarStandingStartTransient_definition.jl")
+include("SlipCarStandingStart_definition.jl")
+include("SlipCar_definition.jl")
+include("SlipCruiseIcePatch_definition.jl")
+include("SlipCruiseTransient_definition.jl")
+include("SlipWheel1D_definition.jl")
+include("TestBodyAnalysis_definition.jl")
+include("TestBody_definition.jl")
+include("TestDrivelineAnalysis_definition.jl")
+include("TestDriveline_definition.jl")
+include("TestGradeBodyAnalysis_definition.jl")
+include("TestGradeBody_definition.jl")
+include("TestGradeForceAnalysis_definition.jl")
+include("TestGradeForce_definition.jl")
+include("TestSlipWheel1DAnalysis_definition.jl")
+include("TestSlipWheel1D_definition.jl")
+include("TestTireFrictionCurve_definition.jl")
+include("TireFrictionCurveSweep_definition.jl")
+include("TireFrictionCurve_definition.jl")
+include("TuningCruiseStep_definition.jl")
+include("TuningCruiseTransient_definition.jl")
+include("WheeledCarFullThrottleTransient_definition.jl")
+include("WheeledCarFullThrottle_definition.jl")
+include("WheeledCar_definition.jl")
+include("WheeledDriveline_definition.jl")

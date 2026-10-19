@@ -1,0 +1,67 @@
+"short SlipCarStandingStart component description"
+component SlipCarStandingStart
+  cmd = BlockComponents.Sources.Constant(k = 150) {^cmd}
+  friction = BlockComponents.Sources.Constant(k = 0.2) {^friction}
+  road = BlockComponents.Sources.Constant(k = 0) {^road}
+  car = MyCar.SlipCar() {^car}
+relations
+  connect(cmd.y, car.tau_cmd) {^id5}
+  connect(road.y, car.grade) {^id6}
+  connect(friction.y, car.mu_scale) {^id7}
+  initial car.body.mass.s = 0
+  initial car.body.mass.v = 0
+  initial car.engine.lag.x = 0
+  initial car.wheel_inertia.phi = 0
+  initial car.wheel_inertia.w = 0
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 650, "y2": 750}}}
+    },
+    "friction": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 200, "y2": 300}}}
+    },
+    "road": {"Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 50, "y2": 150}}}},
+    "car": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 440, "y2": 540}}}
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 253, "y": 700}, {"x": 253, "y": 516}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id6": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 252.5, "y": 100}, {"x": 252.5, "y": 453}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 230, "y": 250}, {"x": 230, "y": 470}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,95 @@
+"short CruiseLoopStep component description"
+component SlipCruiseIcePatch
+  controller = MyCar.CruiseController(y_max = 150, y_min = 0, xi0 = 31.078 / 56) {^controller}
+  road = BlockComponents.Sources.Constant(k = 0) {^road}
+  demand = BlockComponents.Sources.Constant(k = 90) {^demand}
+  friction = BlockComponents.Sources.Pulse(amplitude = 0.05, offset = 1, start_time = 4, duty_cycle = 1, period = 8) {^friction}
+  plant = MyCar.SlipCar() {^plant}
+relations
+  initial plant.body.mass.s = 0
+  initial plant.body.mass.v = 25
+  initial plant.engine.lag.x = 31.078
+  # The slip tire decouples wheel speed from vehicle speed, so the wheel carries its own state.
+  initial plant.wheel_inertia.phi = 0
+  # 25 m/s plus the 0.00156 slip that produces the 401 N cruise tractive force: 25*1.00156/0.31.
+  initial plant.wheel_inertia.w = 80.7708
+  connect(demand.y, controller.u_s) {^id6}
+  connect(controller.y, plant.tau_cmd) {^id7}
+  connect(road.y, plant.grade) {^id8}
+  connect(plant.v_kmh, controller.u_m) {^id9}
+  connect(friction.y, plant.mu_scale) {^id10}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "controller": {
+      "Dyad": {"placement": {"diagram": {"x1": 360, "x2": 460, "y1": 220, "y2": 320}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 430, "x2": 530, "y1": -40, "y2": 60}}}
+    },
+    "demand": {
+      "Dyad": {"placement": {"diagram": {"x1": 170, "x2": 270, "y1": 200, "y2": 300}}}
+    },
+    "friction": {
+      "Dyad": {"placement": {"diagram": {"x1": 400, "x2": 500, "y1": 90, "y2": 190}}}
+    },
+    "plant": {
+      "Dyad": {"placement": {"diagram": {"x1": 620, "x2": 720, "y1": 190, "y2": 290}}}
+    },
+    "id6": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 318, "y": 250}, {"x": 318, "y": 253}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 546, "y": 270}, {"x": 546, "y": 266}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 577.5, "y": 10}, {"x": 577.5, "y": 203}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 770, "y": 251}, {"x": 770, "y": 440}, {"x": 377, "y": 440}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 562.5, "y": 140}, {"x": 562.5, "y": 220}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end
