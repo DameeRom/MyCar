@@ -1,16 +1,19 @@
 "short Car component description"
 component GradeCar
   tau_cmd = Dyad.RealInput() {^tau_cmd}
-  engine = MyCar.Engine(T_max = T_max) {^engine}
+  engine = MyCar.Engine(T_max = T_max, theta_e = theta_e) {^engine}
   driveline = MyCar.Driveline() {^driveline}
   fixed = RotationalComponents.Components.Fixed() {^fixed}
   fixed1 = TranslationalComponents.Components.Fixed() {^fixed1}
   vsensor = TranslationalComponents.Sensors.VelocitySensor() {^vsensor}
   gain = BlockComponents.Math.Gain(k = 3.6) {^gain}
   v_kmh = Dyad.RealOutput() {^v_kmh}
-  body = MyCar.GradeBody() {^body}
+  body = MyCar.GradeBody(m = m) {^body}
   grade = Dyad.RealInput() {^grade}
   parameter T_max::Torque() = 150
+  parameter m::Mass() = 1400
+  "Injection-to-torque transport delay"
+  structural parameter theta_e::Time = 0.3
 relations
   connect(tau_cmd, engine.tau_cmd) {^id11}
   connect(engine.spline, driveline.spline) {^id12}

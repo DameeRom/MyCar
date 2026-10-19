@@ -5,7 +5,7 @@
 
 
 @doc Markdown.doc"""
-   GradeCar(; name, T_max)
+   GradeCar(; name, theta_e, T_max, m)
 
 short Car component description
 
@@ -13,7 +13,9 @@ short Car component description
 
 | Name         | Description                         | Units  |   Default value |
 | ------------ | ----------------------------------- | ------ | --------------- |
+| `theta_e`         | Injection-to-torque transport delay                         | s  |   0.3 |
 | `T_max`         |                          | N.m  |   150 |
+| `m`         |                          | kg  |   1400 |
 
 ## Connectors
 
@@ -21,7 +23,7 @@ short Car component description
  * `v_kmh` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
  * `grade` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
 """
-@component function GradeCar(; name = nothing, T_max=Float64(150), kwargs...)
+@component function GradeCar(; name = nothing, theta_e=0.3, T_max=Float64(150), m=Float64(1400), kwargs...)
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -55,6 +57,9 @@ short Car component description
   __local__T_max = T_max
   append!(__params, @parameters (T_max::Real))
   __initial_conditions[T_max] = __local__T_max
+  __local__m = m
+  append!(__params, @parameters (m::Real), [bounds = (0, Inf)])
+  __initial_conditions[m] = __local__m
 
   ### Final Parameters (assignments)
 
@@ -73,7 +78,7 @@ short Car component description
   ### Components
   # Subcomponent engine of type MyCar.Engine
   engine_overrides = __pop_subcomponent_overrides!(__overrides, "engine")
-  push!(__systems, @named engine = MyCar.Engine(; T_max=T_max, engine_overrides...))
+  push!(__systems, @named engine = MyCar.Engine(; T_max=T_max, theta_e=theta_e, engine_overrides...))
   # Subcomponent driveline of type MyCar.Driveline
   driveline_overrides = __pop_subcomponent_overrides!(__overrides, "driveline")
   push!(__systems, @named driveline = MyCar.Driveline(; driveline_overrides...))
@@ -91,7 +96,7 @@ short Car component description
   push!(__systems, @named gain = BlockComponents.Math.Gain(; k=3.6, gain_overrides...))
   # Subcomponent body of type MyCar.GradeBody
   body_overrides = __pop_subcomponent_overrides!(__overrides, "body")
-  push!(__systems, @named body = MyCar.GradeBody(; body_overrides...))
+  push!(__systems, @named body = MyCar.GradeBody(; m=m, body_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
