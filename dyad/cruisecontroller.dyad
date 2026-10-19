@@ -33,9 +33,6 @@ metadata {
     "panel": {}
   },
   "_links": {
-    "error": {
-      "Dyad": {"placement": {"diagram": {"x1": 260, "x2": 360, "y1": 340, "y2": 440}}}
-    },
     "u_s": {
       "Dyad": {"placement": {"diagram": {"x1": -30, "x2": 50, "y1": 320, "y2": 400}}}
     },
