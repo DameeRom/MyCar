@@ -16,11 +16,15 @@ if isfile(joinpath((@__DIR__) |> Base.dirname, "dyad", "definitions.jl"))
 end
 
 import BlockComponents
+import DiscreteComponents
 import DyadData
 import DyadInterface
+import ElectricalComponents
+import HydraulicComponents
 import RotationalComponents
 import ThermalComponents
 import TranslationalComponents
+import VehicleSystemsComponents
 @doc Markdown.doc"""
 This connector represents an electrical pin with voltage and current as the potential and flow variables, respectively.
 """
@@ -199,6 +203,8 @@ component.
 end
 
 
+include("AirPathStepTransient_definition.jl")
+include("AirPathStep_definition.jl")
 include("Body_definition.jl")
 include("CarFullThrottleTransient_definition.jl")
 include("CarFullThrottle_definition.jl")
@@ -219,6 +225,7 @@ include("GradeCarFullThrottleTransient_definition.jl")
 include("GradeCarFullThrottle_definition.jl")
 include("GradeCar_definition.jl")
 include("GradeForce_definition.jl")
+include("Manifold_definition.jl")
 include("MeasurementNoise_definition.jl")
 include("NoisyCruiseStep_definition.jl")
 include("NoisyCruiseTransient_definition.jl")

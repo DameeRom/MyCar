@@ -1,0 +1,108 @@
+"short AirPathStep component description"
+component AirPathStep
+  manifold = MyCar.Manifold() {^manifold}
+  throttle_cmd = BlockComponents.Sources.Step(offset = 0, height = 1, start_time = 1) {^throttle_cmd}
+  speed = BlockComponents.Sources.Constant(k = 314.159) {^speed}
+  throttle = VehicleSystemsComponents.Vehicle.Engine.Throttle() {^throttle}
+  cylinderairflow = VehicleSystemsComponents.Vehicle.Engine.CylinderAirflow() {^cylinderairflow}
+  no_booster = BlockComponents.Sources.Constant(k = 0) {^no_booster}
+relations
+  connect(throttle_cmd.y, throttle.u_thr) {^id7}
+  connect(speed.y, cylinderairflow.omega) {^id8}
+  connect(no_booster.y, manifold.mdot_bst) {^id9}
+  connect(cylinderairflow.mdot_cyl, manifold.mdot_cyl) {^id10}
+  connect(throttle.mdot_thr, manifold.mdot_thr) {^id11}
+  connect(manifold.p_m, throttle.p_m) {^id12}
+  connect(cylinderairflow.p_m, manifold.p_m) {^id13}
+  initial manifold.p = 101325
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "manifold": {
+      "Dyad": {"placement": {"diagram": {"x1": 460, "x2": 560, "y1": 450, "y2": 550}}}
+    },
+    "throttle_cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": 80, "x2": 180, "y1": 140, "y2": 240}}}
+    },
+    "speed": {
+      "Dyad": {"placement": {"diagram": {"x1": 50, "x2": 150, "y1": 750, "y2": 850}}}
+    },
+    "throttle": {
+      "Dyad": {"placement": {"diagram": {"x1": 290, "x2": 390, "y1": 160, "y2": 260}}}
+    },
+    "cylinderairflow": {
+      "Dyad": {"placement": {"diagram": {"x1": 290, "x2": 390, "y1": 730, "y2": 830}}}
+    },
+    "no_booster": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 450, "y2": 550}}}
+    },
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 425, "y": 780}, {"x": 425, "y": 525}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 425, "y": 210}, {"x": 425, "y": 475}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 690, "y": 500},
+              {"x": 690, "y": 330},
+              {"x": 250, "y": 330},
+              {"x": 250, "y": 230}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 260, "y": 760},
+              {"x": 260, "y": 670},
+              {"x": 690, "y": 670},
+              {"x": 690, "y": 500}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    }
+  }
+}
+end
