@@ -1,0 +1,71 @@
+"short MapEngineDyno component description"
+component MapEngineDyno
+  pedal = BlockComponents.Sources.Step(height = pedal_final - pedal_initial, offset = pedal_initial, start_time = t_step) {^pedal}
+  no_booster = BlockComponents.Sources.Constant(k = 0) {^no_booster}
+  engine = MapEngine() {^engine}
+  mounts = RotationalComponents.Components.Fixed() {^mounts}
+  dyno = RotationalComponents.Sources.VelocitySource() {^dyno}
+  speed = BlockComponents.Sources.Constant(k = rpm * pi / 30) {^speed}
+  "Held engine speed [rpm]"
+  parameter rpm::Real = 3080.0
+  "Pedal before the step"
+  parameter pedal_initial::Real = 0.1034
+  "Pedal after the step"
+  parameter pedal_final::Real = 0.12
+  "Pedal step time"
+  parameter t_step::Time = 1.0
+  "Initial manifold pressure"
+  parameter p_m0::Pressure = 47829.1
+relations
+  connect(pedal.y, engine.pedal) {^id7}
+  connect(no_booster.y, engine.mdot_bst) {^id8}
+  connect(speed.y, dyno.w_ref) {^id9}
+  connect(engine.spline, dyno.spline) {^id10}
+  connect(engine.support, mounts.spline) {^id11}
+  connect(dyno.support, mounts.spline) {^id12}
+  initial dyno.phi = 0
+  initial engine.air.manifold.p = p_m0
+metadata {
+  "_links": {
+    "pedal": {
+      "Dyad": {"placement": {"diagram": {"x1": 40, "y1": 280, "x2": 140, "y2": 380}}}
+    },
+    "no_booster": {
+      "Dyad": {"placement": {"diagram": {"x1": 50, "y1": 550, "x2": 150, "y2": 650}}}
+    },
+    "engine": {
+      "Dyad": {"placement": {"diagram": {"x1": 300, "y1": 300, "x2": 500, "y2": 500}}}
+    },
+    "mounts": {
+      "Dyad": {"placement": {"diagram": {"x1": 550, "y1": 750, "x2": 650, "y2": 850}}}
+    },
+    "dyno": {
+      "Dyad": {"placement": {"diagram": {"x1": 850, "y1": 430, "x2": 950, "y2": 530}}}
+    },
+    "speed": {
+      "Dyad": {"placement": {"diagram": {"x1": 620, "y1": 430, "x2": 720, "y2": 530}}}
+    },
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 210, "y": 600}, {"x": 210, "y": 366}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 990, "y": 346}, {"x": 990, "y": 480}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 600, "y": 382}], "E": 2}], "path": {}}},
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 900, "y": 640}, {"x": 600, "y": 640}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

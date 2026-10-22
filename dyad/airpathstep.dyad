@@ -1,8 +1,8 @@
 "short AirPathStep component description"
 component AirPathStep
   manifold = MyCar.Manifold() {^manifold}
-  throttle_cmd = BlockComponents.Sources.Step(offset = 0, height = 1, start_time = 1) {^throttle_cmd}
-  speed = BlockComponents.Sources.Constant(k = 314.159) {^speed}
+  throttle_cmd = BlockComponents.Sources.Step(offset = 0, start_time = 1, height = 0.005) {^throttle_cmd}
+  speed = BlockComponents.Sources.Constant(k = 83.776) {^speed}
   throttle = VehicleSystemsComponents.Vehicle.Engine.Throttle() {^throttle}
   cylinderairflow = VehicleSystemsComponents.Vehicle.Engine.CylinderAirflow() {^cylinderairflow}
   no_booster = BlockComponents.Sources.Constant(k = 0) {^no_booster}

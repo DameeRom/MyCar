@@ -58,10 +58,10 @@ short AirPathStep component description
   push!(__systems, @named manifold = MyCar.Manifold(; manifold_overrides...))
   # Subcomponent throttle_cmd of type BlockComponents.Sources.Step
   throttle_cmd_overrides = __pop_subcomponent_overrides!(__overrides, "throttle_cmd")
-  push!(__systems, @named throttle_cmd = BlockComponents.Sources.Step(; offset=Float64(0), height=Float64(1), start_time=Float64(1), throttle_cmd_overrides...))
+  push!(__systems, @named throttle_cmd = BlockComponents.Sources.Step(; offset=Float64(0), start_time=Float64(1), height=0.005, throttle_cmd_overrides...))
   # Subcomponent speed of type BlockComponents.Sources.Constant
   speed_overrides = __pop_subcomponent_overrides!(__overrides, "speed")
-  push!(__systems, @named speed = BlockComponents.Sources.Constant(; k=314.159, speed_overrides...))
+  push!(__systems, @named speed = BlockComponents.Sources.Constant(; k=83.776, speed_overrides...))
   # Subcomponent throttle of type VehicleSystemsComponents.Vehicle.Engine.Throttle
   throttle_overrides = __pop_subcomponent_overrides!(__overrides, "throttle")
   push!(__systems, @named throttle = VehicleSystemsComponents.Vehicle.Engine.Throttle(; throttle_overrides...))
