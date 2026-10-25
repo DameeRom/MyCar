@@ -1,0 +1,44 @@
+"short MappedCarCruise component description"
+component MappedCarCruise
+  pedal = BlockComponents.Sources.Constant(k = pedal_cmd) {^pedal}
+  "Wheel radius 0.31 m"
+  car = MappedCar(ratio_initial = rpm0 * pi / 30 * 0.31 / (speed_kmh / 3.6)) {^car}
+  "Initial road speed [km/h]"
+  parameter speed_kmh::Real = 90
+  "Pedal that holds speed_kmh"
+  parameter pedal_cmd::Real = 0.0916
+  "Initial engine speed [rpm], steady at pedal_cmd"
+  parameter rpm0::Real = 2182
+  "Initial manifold pressure, steady at pedal_cmd"
+  parameter p_m0::Pressure = 54420
+  constant1 = BlockComponents.Sources.Constant(k = 0) {^constant1}
+relations
+  connect(pedal.y, car.pedal) {^id4}
+  initial car.body.mass.s = 0
+  initial car.body.mass.v = speed_kmh / 3.6
+  initial car.flywheel.w = rpm0 * pi / 30
+  initial car.flywheel.phi = 0
+  initial car.driveline.clutch.spline_b.phi = 0
+  initial car.engine.air.manifold.p = p_m0
+  connect(constant1.y, car.F_break) {^id5}
+metadata {
+  "_links": {
+    "pedal": {
+      "Dyad": {"placement": {"diagram": {"x1": 150, "y1": 430, "x2": 250, "y2": 530}}}
+    },
+    "car": {
+      "Dyad": {"placement": {"diagram": {"x1": 400, "y1": 400, "x2": 600, "y2": 600}}}
+    },
+    "constant1": {
+      "Dyad": {"placement": {"diagram": {"x1": 150, "x2": 250, "y1": 600, "y2": 700}}}
+    },
+    "id4": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 327.5, "y": 480}, {"x": 327.5, "y": 474}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id5": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 402, "y": 650}], "E": 2}], "path": {}}}
+  }
+}
+end

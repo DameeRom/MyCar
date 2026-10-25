@@ -8,8 +8,8 @@ using DyadInterface
 using DyadInterface: ODEAlg, DEVerbosity, OptimizationLevel, SpecializationLevel
 using ModelingToolkit: SymbolicT, toggle_namespacing
 using DyadInterface: AbstractTransientAnalysisSpec, TransientAnalysisSpec
-@kwdef mutable struct WorldSpec <: AbstractTransientAnalysisSpec
-  name::Symbol = :World
+@kwdef mutable struct TestBodyAnalysisSpec <: AbstractTransientAnalysisSpec
+  name::Symbol = :TestBodyAnalysis
   var"alg"::ODEAlg.Type = ODEAlg.Auto()
   var"start"::Float64 = 0
   var"stop"::Float64 = 10
@@ -25,22 +25,18 @@ using DyadInterface: AbstractTransientAnalysisSpec, TransientAnalysisSpec
   var"specialization"::SpecializationLevel.Type = SpecializationLevel.Despecialize()
   var"verbose"::DEVerbosity.Type = DEVerbosity.Standard()
   var"log_file"::String = ""
-  var"T_inf"::Float64 = 380
-  var"h"::Float64 = 0.7
-  # A simple lumped thermal model
-  var"model"::Union{Nothing, System} = MyCar.Hello(; name=:Hello)
+  var"model"::Union{Nothing, System} = MyCar.TestBody(; name=:TestBody)
 end
 
-function DyadInterface.run_analysis(spec::WorldSpec)
+function DyadInterface.run_analysis(spec::TestBodyAnalysisSpec)
   overrides = Dict{SymbolicT, SymbolicT}()
   no_namespace_model = toggle_namespacing(spec.model, false)
-  push!(overrides, no_namespace_model.T_inf => spec.var"T_inf")
-  push!(overrides, no_namespace_model.h => spec.var"h")
+  
   base_spec = TransientAnalysisSpec(;
     name=:TransientAnalysis, overrides, alg=spec.alg, start=spec.start, stop=spec.stop, abstol=spec.abstol, reltol=spec.reltol, saveat=spec.saveat, dtmax=spec.dtmax, tstops=spec.tstops, automatic_discontinuity_detection=spec.automatic_discontinuity_detection, optimize=spec.optimize, progress=spec.progress, respecialize=spec.respecialize, specialization=spec.specialization, verbose=spec.verbose, log_file=spec.log_file, model=spec.model
   )
   run_analysis(base_spec)
 end
 
-World(;kwargs...) = run_analysis(WorldSpec(;kwargs...))
-export World, WorldSpec
+TestBodyAnalysis(;kwargs...) = run_analysis(TestBodyAnalysisSpec(;kwargs...))
+export TestBodyAnalysis, TestBodyAnalysisSpec

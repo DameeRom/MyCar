@@ -1,0 +1,5 @@
+"short EngineStepTransient analysis description"
+analysis EngineStepTransient
+  extends TransientAnalysis(stop = 3)
+  model = EngineStep()
+end

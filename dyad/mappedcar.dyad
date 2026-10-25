@@ -1,0 +1,240 @@
+"short Car component description"
+component MappedCar
+  pedal = RealInput() {^pedal}
+  v_kmh = RealOutput() {^v_kmh}
+  p_m = RealOutput() {^p_m}
+  fuel_lph = RealOutput() {^fuel_lph}
+  engine = MapEngine() {^engine}
+  "Crankshaft and flywheel, J as MappedEngine assumes"
+  flywheel = RotationalComponents.Components.Inertia(J = 0.15) {^flywheel}
+  no_booster = BlockComponents.Sources.Constant(k = 0) {^no_booster}
+  "kg/s of petrol to L/h: 3600 / 0.745"
+  to_lph = BlockComponents.Math.Gain(k = 4832.2) {^to_lph}
+  driveline = VehicleSystemsComponents.Vehicle.CVTDriveline(ratio_initial = ratio_initial) {^driveline}
+  body = Body() {^body}
+  vsensor = TranslationalComponents.Sensors.VelocitySensor() {^vsensor}
+  to_kmh = BlockComponents.Math.Gain(k = 3.6) {^to_kmh}
+  rot_ground = RotationalComponents.Components.Fixed() {^rot_ground}
+  trans_ground = TranslationalComponents.Components.Fixed() {^trans_ground}
+  F_break = Dyad.RealInput() {^F_break}
+  brake = VehicleSystemsComponents.Vehicle.RoadBrake() {^brake}
+  "Initial CVT ratio, engine to wheel"
+  parameter ratio_initial::Real = 12
+relations
+  connect(pedal, engine.pedal) {^id17}
+  connect(pedal, driveline.pedal) {^id18}
+  connect(no_booster.y, engine.mdot_bst) {^id19}
+  connect(engine.spline, flywheel.spline_a) {^id20}
+  connect(flywheel.spline_b, driveline.spline)
+  connect(engine.support, rot_ground.spline) {^id21}
+  connect(driveline.support_r, rot_ground.spline) {^id22}
+  connect(driveline.flange, body.flange) {^id23}
+  connect(driveline.support_t, trans_ground.flange, brake.support) {^id24}
+  connect(vsensor.flange, body.flange, brake.flange) {^id25}
+  connect(vsensor.v, to_kmh.u)
+  connect(to_kmh.y, v_kmh)
+  connect(engine.p_m, p_m) {^id26}
+  connect(engine.mdot_fuel, to_lph.u) {^id27}
+  connect(to_lph.y, fuel_lph)
+  connect(brake.F_cmd, F_break) {^id28}
+metadata {
+  "_links": {
+    "pedal": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 320, "y2": 420}}}
+    },
+    "v_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 630, "y2": 730}}}
+    },
+    "p_m": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 300, "y2": 400}}}
+    },
+    "fuel_lph": {
+      "Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 450, "y2": 550}}}
+    },
+    "engine": {
+      "Dyad": {"placement": {"diagram": {"x1": 120, "x2": 220, "y1": 450, "y2": 550}}}
+    },
+    "flywheel": {
+      "Dyad": {"placement": {"diagram": {"x1": 290, "x2": 390, "y1": 450, "y2": 550}}}
+    },
+    "no_booster": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 620, "y2": 720}}}
+    },
+    "to_lph": {
+      "Dyad": {"placement": {"diagram": {"x1": 770, "x2": 870, "y1": 450, "y2": 550}}}
+    },
+    "driveline": {
+      "Dyad": {"placement": {"diagram": {"x1": 440, "x2": 540, "y1": 450, "y2": 550}}}
+    },
+    "body": {
+      "Dyad": {"placement": {"diagram": {"x1": 580, "x2": 680, "y1": 450, "y2": 550}}}
+    },
+    "vsensor": {
+      "Dyad": {"placement": {"diagram": {"x1": 660, "x2": 760, "y1": 630, "y2": 730}}}
+    },
+    "to_kmh": {
+      "Dyad": {"placement": {"diagram": {"x1": 810, "x2": 910, "y1": 630, "y2": 730}}}
+    },
+    "rot_ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 310, "x2": 410, "y1": 800, "y2": 900}}}
+    },
+    "trans_ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 540, "x2": 640, "y1": 880, "y2": 980}}}
+    },
+    "F_break": {
+      "Dyad": {"placement": {"diagram": {"x1": -30, "x2": 50, "y1": 960, "y2": 1040}}}
+    },
+    "brake": {
+      "Dyad": {"placement": {"diagram": {"x1": 710, "x2": 810, "y1": 770, "y2": 870}}}
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 40, "y": 370}, {"x": 40, "y": 465}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 40, "y": 370},
+              {"x": 40, "y": 400},
+              {"x": 400, "y": 400},
+              {"x": 400, "y": 470}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 100, "y": 670}, {"x": 100, "y": 486}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id20": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 266.6666666666667, "y": 473}, {"x": 266.6666666666667, "y": 500}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id21": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 250, "y": 491}, {"x": 250, "y": 760}, {"x": 360, "y": 760}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 478, "y": 590}, {"x": 360, "y": 590}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 550, "y": 500},
+              {"x": 550, "y": 410},
+              {"x": 700, "y": 410},
+              {"x": 700, "y": 500}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id24": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 502, "y": 590}, {"x": 590, "y": 590}], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": 3, "M": [{"x": 760, "y": 850}], "E": -1}
+        ],
+        "junctions": [{"x": 590, "y": 850}],
+        "path": {}
+      }
+    },
+    "id25": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 640, "y": 680}], "E": -1},
+          {
+            "S": -1,
+            "M": [{"x": 640, "y": 610}, {"x": 700, "y": 610}, {"x": 700, "y": 500}],
+            "E": 2
+          },
+          {"S": 3, "M": [{"x": 640, "y": 820}], "E": -1}
+        ],
+        "junctions": [{"x": 640, "y": 680}],
+        "path": {}
+      }
+    },
+    "id26": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 230, "y": 538},
+              {"x": 230, "y": 290},
+              {"x": 980, "y": 290},
+              {"x": 980, "y": 350}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id27": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 240, "y": 514},
+              {"x": 240, "y": 350},
+              {"x": 725, "y": 350},
+              {"x": 725, "y": 500}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id28": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 760, "y": 760}, {"x": 900, "y": 760}, {"x": 900, "y": 1000}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    }
+  }
+}
+end

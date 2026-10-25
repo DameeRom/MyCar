@@ -1,0 +1,27 @@
+"short MappedCarCruiseTransient analysis description"
+analysis MappedCarCruiseTransient
+  extends Dyad.TransientAnalysis(stop = 60)
+  model = MyCar.MappedCarCruise(speed_kmh = 90, pedal_cmd = 0.0916, rpm0 = 2182, p_m0 = 54420)
+relations
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  }
+}
+end
