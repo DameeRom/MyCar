@@ -21,6 +21,7 @@ short Car component description
  * `v_kmh` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
  * `p_m` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
  * `fuel_lph` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
+ * `F_break` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
 """
 @component function MappedCar(; name = nothing, ratio_initial=Float64(12), kwargs...)
   isnothing(name) && throw(ArgumentError("""
@@ -64,6 +65,7 @@ short Car component description
   append!(__vars, @variables (v_kmh(t)::Real), [output = true])
   append!(__vars, @variables (p_m(t)::Real), [output = true])
   append!(__vars, @variables (fuel_lph(t)::Real), [output = true])
+  append!(__vars, @variables (F_break(t)::Real), [input = true])
 
   ### Variables (declarations)
 
@@ -103,6 +105,9 @@ short Car component description
   # Subcomponent trans_ground of type TranslationalComponents.Components.Fixed
   trans_ground_overrides = __pop_subcomponent_overrides!(__overrides, "trans_ground")
   push!(__systems, @named trans_ground = TranslationalComponents.Components.Fixed(; trans_ground_overrides...))
+  # Subcomponent brake of type VehicleSystemsComponents.Vehicle.RoadBrake
+  brake_overrides = __pop_subcomponent_overrides!(__overrides, "brake")
+  push!(__systems, @named brake = VehicleSystemsComponents.Vehicle.RoadBrake(; brake_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
@@ -123,13 +128,14 @@ short Car component description
   push!(__eqs, connect(engine.support, rot_ground.spline))
   push!(__eqs, connect(driveline.support_r, rot_ground.spline))
   push!(__eqs, connect(driveline.flange, body.flange))
-  push!(__eqs, connect(driveline.support_t, trans_ground.flange))
-  push!(__eqs, connect(vsensor.flange, body.flange))
+  push!(__eqs, connect(driveline.support_t, trans_ground.flange, brake.support))
+  push!(__eqs, connect(vsensor.flange, body.flange, brake.flange))
   push!(__eqs, connect(vsensor.v, to_kmh.u))
   push!(__eqs, connect(to_kmh.y, v_kmh))
   push!(__eqs, connect(engine.p_m, p_m))
   push!(__eqs, connect(engine.mdot_fuel, to_lph.u))
   push!(__eqs, connect(to_lph.y, fuel_lph))
+  push!(__eqs, connect(brake.F_cmd, F_break))
 
   # Return completely constructed System
   return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)

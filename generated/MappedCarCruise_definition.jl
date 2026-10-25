@@ -80,6 +80,9 @@ short MappedCarCruise component description
   # Subcomponent car of type MyCar.MappedCar
   car_overrides = __pop_subcomponent_overrides!(__overrides, "car")
   push!(__systems, @named car = MyCar.MappedCar(; ratio_initial=rpm0 * pi / 30 * 0.31 / (speed_kmh / 3.6), car_overrides...))
+  # Subcomponent constant1 of type BlockComponents.Sources.Constant
+  constant1_overrides = __pop_subcomponent_overrides!(__overrides, "constant1")
+  push!(__systems, @named constant1 = BlockComponents.Sources.Constant(; k=Float64(0), constant1_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
@@ -99,6 +102,7 @@ short MappedCarCruise component description
 
   ### Equations
   push!(__eqs, connect(pedal.y, car.pedal))
+  push!(__eqs, connect(constant1.y, car.F_break))
 
   # Return completely constructed System
   return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
