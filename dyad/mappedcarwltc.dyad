@@ -1,0 +1,154 @@
+"WLTC class 3b bench: the trace drives the cruise controller, the controller's effort splits into pedal and brake, and the run's fuel and distance are totalled"
+component MappedCarWLTC
+  "WLTC class 3b target speed [km/h]"
+  trace = VehicleSystemsComponents.Vehicle.DriveCycle() {^trace}
+  "Driver: PID on the speed error, output an effort in [-1, 1]"
+  driver = CruiseController(k = k, Ti = Ti, Td = Td, xd0 = 0, xi0 = 0, y_max = 1, y_min = -1) {^driver}
+  car = MappedCar() {^car}
+  "Positive part of the effort: the pedal"
+  pedal_part = BlockComponents.Nonlinear.Limiter(y_min = 0, y_max = 1) {^pedal_part}
+  "Negative part of the effort"
+  brake_part = BlockComponents.Nonlinear.Limiter(y_min = -1, y_max = 0) {^brake_part}
+  "Negative effort to brake force [N]"
+  to_force = BlockComponents.Math.Gain(k = -F_brake_max) {^to_force}
+  "L/h to liters: 1 / 3600"
+  fuel_L = BlockComponents.Continuous.Integrator(k = 1 / 3600, x0 = 0) {^fuel_L}
+  "km/h to km: 1 / 3600"
+  dist_km = BlockComponents.Continuous.Integrator(k = 1 / 3600, x0 = 0) {^dist_km}
+  "Controller gain, effort per km/h"
+  parameter k::Real = 0.14
+  "Integral time"
+  parameter Ti::Time = 3.5
+  "Derivative time"
+  parameter Td::Time = 0.7
+  "Brake force at an effort of -1"
+  parameter F_brake_max::Force = 4000
+  
+relations
+  connect(trace.y, driver.u_s) {^id9}
+  connect(car.v_kmh, driver.u_m) {^id10}
+  connect(driver.y, pedal_part.u, brake_part.u) {^id11}
+  connect(pedal_part.y, car.pedal) {^id12}
+  connect(brake_part.y, to_force.u) {^id13}
+  connect(to_force.y, car.F_break) {^id14}
+  connect(car.fuel_lph, fuel_L.u) {^id15}
+  connect(car.v_kmh, dist_km.u) {^id16}
+  initial car.body.mass.s = 0
+  initial car.body.mass.v = 0
+  initial car.flywheel.w = 775 * pi / 30
+  initial car.flywheel.phi = 0
+  initial car.driveline.clutch.spline_b.phi = 0
+  initial car.engine.air.manifold.p = 33600
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "trace": {
+      "Dyad": {"placement": {"diagram": {"x1": 50, "x2": 150, "y1": 290, "y2": 390}}}
+    },
+    "driver": {
+      "Dyad": {"placement": {"diagram": {"x1": 250, "x2": 350, "y1": 300, "y2": 400}}}
+    },
+    "car": {
+      "Dyad": {"placement": {"diagram": {"x1": 700, "x2": 850, "y1": 280, "y2": 430}}}
+    },
+    "pedal_part": {
+      "Dyad": {"placement": {"diagram": {"x1": 480, "x2": 580, "y1": 200, "y2": 300}}}
+    },
+    "brake_part": {
+      "Dyad": {"placement": {"diagram": {"x1": 430, "x2": 530, "y1": 450, "y2": 550}}}
+    },
+    "to_force": {
+      "Dyad": {"placement": {"diagram": {"x1": 570, "x2": 670, "y1": 450, "y2": 550}}}
+    },
+    "fuel_L": {
+      "Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 180, "y2": 280}}}
+    },
+    "dist_km": {
+      "Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 620, "y2": 720}}}
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 183.66666666666666, "y": 340}, {"x": 183.66666666666666, "y": 333}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 880.75, "y": 382},
+              {"x": 880.75, "y": 380},
+              {"x": 910, "y": 380},
+              {"x": 910, "y": 800},
+              {"x": 190, "y": 800},
+              {"x": 190, "y": 420},
+              {"x": 267, "y": 420}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 400, "y": 350}], "E": -1},
+          {"S": -1, "M": [{"x": 400, "y": 250}], "E": 2},
+          {"S": 3, "M": [{"x": 400, "y": 500}], "E": -1}
+        ],
+        "junctions": [{"x": 400, "y": 350}],
+        "path": {}
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 640, "y": 250}, {"x": 640, "y": 335.5}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id14": {
+      "Dyad": {"edges": [{"S": 1, "M": [{"x": 701.5, "y": 500}], "E": 2}], "path": {}}
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 930, "y": 355}, {"x": 930, "y": 230}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 950, "y": 382}, {"x": 950, "y": 670}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

@@ -1,6 +1,6 @@
 "short MappedCarCoastTransient analysis description"
 analysis MappedCarCoastTransient
-  extends Dyad.TransientAnalysis(stop = 100)
+  extends Dyad.TransientAnalysis(stop = 1800, saveat = 1, alg = ODEAlg.Rodas5P())
   model = MyCar.MappedCarCoast()
 relations
 metadata {
