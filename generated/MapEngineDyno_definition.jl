@@ -93,9 +93,9 @@ short MapEngineDyno component description
   # Subcomponent dyno of type RotationalComponents.Sources.VelocitySource
   dyno_overrides = __pop_subcomponent_overrides!(__overrides, "dyno")
   push!(__systems, @named dyno = RotationalComponents.Sources.VelocitySource(; dyno_overrides...))
-  # Subcomponent speed of type BlockComponents.Sources.Constant
+  # Subcomponent speed of type BlockComponents.Sources.Ramp
   speed_overrides = __pop_subcomponent_overrides!(__overrides, "speed")
-  push!(__systems, @named speed = BlockComponents.Sources.Constant(; k=rpm * pi / 30, speed_overrides...))
+  push!(__systems, @named speed = BlockComponents.Sources.Ramp(; offset=rpm * pi / 30, height=(800 - rpm) * pi / 30, start_time=Float64(2), duration=Float64(3), speed_overrides...))
 
   ### Check there are no unmatched overrides
   isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))

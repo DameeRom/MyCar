@@ -5,7 +5,7 @@ component MapEngineDyno
   engine = MapEngine() {^engine}
   mounts = RotationalComponents.Components.Fixed() {^mounts}
   dyno = RotationalComponents.Sources.VelocitySource() {^dyno}
-  speed = BlockComponents.Sources.Constant(k = rpm * pi / 30) {^speed}
+  speed = BlockComponents.Sources.Ramp(offset = rpm * pi / 30, height = (800 - rpm) * pi / 30, start_time = 2, duration = 3)
   "Held engine speed [rpm]"
   parameter rpm::Real = 3080.0
   "Pedal before the step"
@@ -48,7 +48,7 @@ metadata {
     "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
     "id8": {
       "Dyad": {
-        "edges": [{"S": 1, "M": [{"x": 210, "y": 600}, {"x": 210, "y": 366}], "E": 2}],
+        "edges": [{"S": 1, "M": [{"x": 210, "y": 600}, {"x": 210, "y": 372}], "E": 2}],
         "path": {}
       }
     },

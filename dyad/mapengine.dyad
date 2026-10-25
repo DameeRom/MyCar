@@ -9,24 +9,29 @@ component MapEngine
   mdot_co2 = RealOutput() {^mdot_co2}
   air = VehicleSystemsComponents.Vehicle.Engine.AirPath() {^air}
   speed = RotationalComponents.Sensors.VelocitySensor() {^speed}
-  torque_map = VehicleSystemsComponents.Vehicle.Engine.TorqueMap() {^torque_map}
-  fuel_map = VehicleSystemsComponents.Vehicle.Engine.FuelMap() {^fuel_map}
+  torque_map = VehicleSystemsComponents.Vehicle.Engine.CutTorqueMap() {^torque_map}
+  fuel_map = VehicleSystemsComponents.Vehicle.Engine.CutFuelMap() {^fuel_map}
+  cut_logic = VehicleSystemsComponents.Vehicle.Engine.FuelCutLogic() {^cut_logic}
   co2 = BlockComponents.Math.Gain(k = 3.09) {^co2}
   torque = RotationalComponents.Sources.TorqueSource() {^torque}
 relations
-  connect(pedal, air.u_thr) {^id14}
-  connect(mdot_bst, air.mdot_bst) {^id15}
-  connect(speed.w, fuel_map.omega, torque_map.omega) {^id16}
-  connect(speed.w, air.omega) {^id17}
-  connect(air.p_m, torque_map.p_m) {^id18}
-  connect(air.p_m, fuel_map.p_m) {^id19}
-  connect(air.p_m, p_m) {^id20}
-  connect(torque_map.y, torque.tau) {^id21}
-  connect(fuel_map.y, co2.u) {^id22}
-  connect(fuel_map.y, mdot_fuel) {^id23}
-  connect(co2.y, mdot_co2) {^id24}
-  connect(torque.support, support) {^id25}
-  connect(torque.spline, spline, speed.spline) {^id26}
+  connect(pedal, air.u_thr) {^id15}
+  connect(mdot_bst, air.mdot_bst) {^id16}
+  connect(speed.w, fuel_map.omega, torque_map.omega) {^id17}
+  connect(speed.w, air.omega) {^id18}
+  connect(air.p_m, torque_map.p_m) {^id19}
+  connect(air.p_m, fuel_map.p_m) {^id20}
+  connect(air.p_m, p_m) {^id21}
+  connect(torque_map.y, torque.tau) {^id22}
+  connect(fuel_map.y, co2.u) {^id23}
+  connect(fuel_map.y, mdot_fuel) {^id24}
+  connect(co2.y, mdot_co2) {^id25}
+  connect(torque.support, support) {^id26}
+  connect(torque.spline, spline, speed.spline) {^id27}
+  connect(pedal, cut_logic.pedal) {^id28}
+  connect(speed.w, cut_logic.omega) {^id29}
+  connect(cut_logic.cut, fuel_map.cut) {^id30}
+  connect(cut_logic.cut, torque_map.cut) {^id31}
 metadata {
   "_links": {
     "pedal": {
@@ -62,25 +67,28 @@ metadata {
     "fuel_map": {
       "Dyad": {"placement": {"diagram": {"x1": 305, "x2": 405, "y1": 516, "y2": 616}}}
     },
+    "cut_logic": {
+      "Dyad": {"placement": {"diagram": {"x1": 200, "y1": 800, "x2": 300, "y2": 900}}}
+    },
     "co2": {
       "Dyad": {"placement": {"diagram": {"x1": 600, "x2": 700, "y1": 720, "y2": 820}}}
     },
     "torque": {
       "Dyad": {"placement": {"diagram": {"x1": 520, "x2": 620, "y1": 190, "y2": 290}}}
     },
-    "id14": {
+    "id15": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 0, "y": 150}, {"x": 0, "y": 230}], "E": 2}],
         "path": {}
       }
     },
-    "id15": {
+    "id16": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 0, "y": 360}, {"x": 0, "y": 260}], "E": 2}],
         "path": {}
       }
     },
-    "id16": {
+    "id17": {
       "Dyad": {
         "edges": [
           {
@@ -95,7 +103,7 @@ metadata {
         "path": {}
       }
     },
-    "id17": {
+    "id18": {
       "Dyad": {
         "edges": [
           {
@@ -112,35 +120,35 @@ metadata {
         "path": {}
       }
     },
-    "id18": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
-    "id19": {
+    "id19": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id20": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 280, "y": 260}, {"x": 280, "y": 586}], "E": 2}],
         "path": {}
       }
     },
-    "id20": {
+    "id21": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 280, "y": 260}, {"x": 280, "y": 880}], "E": 2}],
         "path": {}
       }
     },
-    "id21": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
-    "id22": {
+    "id22": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id23": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 420, "y": 566}, {"x": 420, "y": 770}], "E": 2}],
         "path": {}
       }
     },
-    "id23": {
+    "id24": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 420, "y": 566}, {"x": 420, "y": 640}], "E": 2}],
         "path": {}
       }
     },
-    "id24": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
-    "id25": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 570, "y": 410}], "E": 2}], "path": {}}},
-    "id26": {
+    "id25": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id26": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 570, "y": 410}], "E": 2}], "path": {}}},
+    "id27": {
       "Dyad": {
         "edges": [
           {"S": 1, "M": [], "E": -1},
@@ -149,6 +157,39 @@ metadata {
         ],
         "junctions": [{"x": 650, "y": 240}],
         "path": {}
+      }
+    },
+    "id28": {
+      "Dyad": {"edges": [{"S": 1, "M": [{"x": 60, "y": 200}, {"x": 60, "y": 830}], "E": 2}]}
+    },
+    "id29": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 970, "y": 110},
+              {"x": 970, "y": 30},
+              {"x": 400, "y": 30},
+              {"x": 400, "y": 380},
+              {"x": 110, "y": 380},
+              {"x": 110, "y": 870}
+            ],
+            "E": 2
+          }
+        ]
+      }
+    },
+    "id30": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 355, "y": 850}], "E": 2}], "path": {}}},
+    "id31": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 580, "y": 850}, {"x": 580, "y": 340}, {"x": 500, "y": 340}],
+            "E": 2
+          }
+        ]
       }
     }
   }
