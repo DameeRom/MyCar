@@ -5,7 +5,7 @@
 
 
 @doc Markdown.doc"""
-   GradeCar(; name, theta_e, T_max, m)
+   GradeCar(; name, theta_e, T_max, m, __overrides)
 
 short Car component description
 
@@ -23,7 +23,7 @@ short Car component description
  * `v_kmh` - This connector represents a real signal as an output from a component ([`RealOutput`](@ref))
  * `grade` - This connector represents a real signal as an input to a component ([`RealInput`](@ref))
 """
-@component function GradeCar(; name = nothing, theta_e=0.3, T_max=Float64(150), m=Float64(1400), kwargs...)
+@component function GradeCar(; name = nothing, var"theta_e"=0.3, var"T_max"=Float64(150), var"m"=Float64(1400), __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -31,7 +31,7 @@ short Car component description
     @named model = GradeCar()
   """))
 
-  __overrides = __build_overrides(kwargs)
+  __overrides = Dict{String, Any}(__overrides)
   __params = Symbolics.SymbolicT[]
   __vars = Symbolics.SymbolicT[]
   __systems = System[]
@@ -40,6 +40,11 @@ short Car component description
   __initialization_eqs = Equation[]
   __eqs = Equation[]
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
+
+  ### Keyword argument overrides
+  haskey(__overrides, "theta_e") && (theta_e = pop!(__overrides, "theta_e"))
+  haskey(__overrides, "T_max") && (T_max = pop!(__overrides, "T_max"))
+  haskey(__overrides, "m") && (m = pop!(__overrides, "m"))
 
   ### Structural Parameters (functions)
 
@@ -56,10 +61,10 @@ short Car component description
   ### Symbolic Parameters
   __local__T_max = T_max
   append!(__params, @parameters (T_max::Real))
-  __initial_conditions[T_max] = __local__T_max
+  __dyad_seed_parameter!(__initial_conditions, __bindings, T_max, __local__T_max)
   __local__m = m
   append!(__params, @parameters (m::Real), [bounds = (0, Inf)])
-  __initial_conditions[m] = __local__m
+  __dyad_seed_parameter!(__initial_conditions, __bindings, m, __local__m)
 
   ### Final Parameters (assignments)
 
@@ -78,28 +83,28 @@ short Car component description
   ### Components
   # Subcomponent engine of type MyCar.Engine
   engine_overrides = __pop_subcomponent_overrides!(__overrides, "engine")
-  push!(__systems, @named engine = MyCar.Engine(; T_max=T_max, theta_e=theta_e, engine_overrides...))
+  push!(__systems, @named engine = MyCar.Engine(; T_max=T_max, theta_e=theta_e, __overrides = engine_overrides))
   # Subcomponent driveline of type MyCar.Driveline
   driveline_overrides = __pop_subcomponent_overrides!(__overrides, "driveline")
-  push!(__systems, @named driveline = MyCar.Driveline(; driveline_overrides...))
+  push!(__systems, @named driveline = MyCar.Driveline(; __overrides = driveline_overrides))
   # Subcomponent fixed of type RotationalComponents.Components.Fixed
   fixed_overrides = __pop_subcomponent_overrides!(__overrides, "fixed")
-  push!(__systems, @named fixed = RotationalComponents.Components.Fixed(; fixed_overrides...))
+  push!(__systems, @named fixed = RotationalComponents.Components.Fixed(; __overrides = fixed_overrides))
   # Subcomponent fixed1 of type TranslationalComponents.Components.Fixed
   fixed1_overrides = __pop_subcomponent_overrides!(__overrides, "fixed1")
-  push!(__systems, @named fixed1 = TranslationalComponents.Components.Fixed(; fixed1_overrides...))
+  push!(__systems, @named fixed1 = TranslationalComponents.Components.Fixed(; __overrides = fixed1_overrides))
   # Subcomponent vsensor of type TranslationalComponents.Sensors.VelocitySensor
   vsensor_overrides = __pop_subcomponent_overrides!(__overrides, "vsensor")
-  push!(__systems, @named vsensor = TranslationalComponents.Sensors.VelocitySensor(; vsensor_overrides...))
+  push!(__systems, @named vsensor = TranslationalComponents.Sensors.VelocitySensor(; __overrides = vsensor_overrides))
   # Subcomponent gain of type BlockComponents.Math.Gain
   gain_overrides = __pop_subcomponent_overrides!(__overrides, "gain")
-  push!(__systems, @named gain = BlockComponents.Math.Gain(; k=3.6, gain_overrides...))
+  push!(__systems, @named gain = BlockComponents.Math.Gain(; k=3.6, __overrides = gain_overrides))
   # Subcomponent body of type MyCar.GradeBody
   body_overrides = __pop_subcomponent_overrides!(__overrides, "body")
-  push!(__systems, @named body = MyCar.GradeBody(; m=m, body_overrides...))
+  push!(__systems, @named body = MyCar.GradeBody(; m=m, __overrides = body_overrides))
 
   ### Check there are no unmatched overrides
-  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
+  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded. Override keys are dotted paths as written in Dyad source (e.g. inner.rate)."))
 
   ### Guesses
 
@@ -119,6 +124,6 @@ short Car component description
   push!(__eqs, connect(body.grade, grade))
 
   # Return completely constructed System
-  return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
+  return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
 end
 export GradeCar

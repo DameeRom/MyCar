@@ -5,7 +5,7 @@
 
 
 @doc Markdown.doc"""
-   MappedCarWLTC(; name, k, Ti, Td, F_brake_max)
+   MappedCarWLTC(; name, k, Ti, Td, F_brake_max, __overrides)
 
 WLTC class 3b bench: the trace drives the cruise controller, the controller's effort splits into pedal and brake, and the run's fuel and distance are totalled
 
@@ -18,7 +18,7 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
 | `Td`         | Derivative time                         | s  |   0.7 |
 | `F_brake_max`         | Brake force at an effort of -1                         | N  |   4000 |
 """
-@component function MappedCarWLTC(; name = nothing, k=0.14, Ti=3.5, Td=0.7, F_brake_max=Float64(4000), kwargs...)
+@component function MappedCarWLTC(; name = nothing, var"k"=0.14, var"Ti"=3.5, var"Td"=0.7, var"F_brake_max"=Float64(4000), __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -26,7 +26,7 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
     @named model = MappedCarWLTC()
   """))
 
-  __overrides = __build_overrides(kwargs)
+  __overrides = Dict{String, Any}(__overrides)
   __params = Symbolics.SymbolicT[]
   __vars = Symbolics.SymbolicT[]
   __systems = System[]
@@ -35,6 +35,12 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
   __initialization_eqs = Equation[]
   __eqs = Equation[]
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
+
+  ### Keyword argument overrides
+  haskey(__overrides, "k") && (k = pop!(__overrides, "k"))
+  haskey(__overrides, "Ti") && (Ti = pop!(__overrides, "Ti"))
+  haskey(__overrides, "Td") && (Td = pop!(__overrides, "Td"))
+  haskey(__overrides, "F_brake_max") && (F_brake_max = pop!(__overrides, "F_brake_max"))
 
   ### Structural Parameters (functions)
 
@@ -51,16 +57,16 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
   ### Symbolic Parameters
   __local__k = k
   append!(__params, @parameters (k::Real), [description = "Controller gain, effort per km/h"])
-  __initial_conditions[k] = __local__k
+  __dyad_seed_parameter!(__initial_conditions, __bindings, k, __local__k)
   __local__Ti = Ti
   append!(__params, @parameters (Ti::Real), [description = "Integral time"])
-  __initial_conditions[Ti] = __local__Ti
+  __dyad_seed_parameter!(__initial_conditions, __bindings, Ti, __local__Ti)
   __local__Td = Td
   append!(__params, @parameters (Td::Real), [description = "Derivative time"])
-  __initial_conditions[Td] = __local__Td
+  __dyad_seed_parameter!(__initial_conditions, __bindings, Td, __local__Td)
   __local__F_brake_max = F_brake_max
   append!(__params, @parameters (F_brake_max::Real), [description = "Brake force at an effort of -1"])
-  __initial_conditions[F_brake_max] = __local__F_brake_max
+  __dyad_seed_parameter!(__initial_conditions, __bindings, F_brake_max, __local__F_brake_max)
 
   ### Final Parameters (assignments)
 
@@ -76,31 +82,31 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
   ### Components
   # Subcomponent trace of type VehicleSystemsComponents.Vehicle.DriveCycle
   trace_overrides = __pop_subcomponent_overrides!(__overrides, "trace")
-  push!(__systems, @named trace = VehicleSystemsComponents.Vehicle.DriveCycle(; trace_overrides...))
+  push!(__systems, @named trace = VehicleSystemsComponents.Vehicle.DriveCycle(; __overrides = trace_overrides))
   # Subcomponent driver of type MyCar.CruiseController
   driver_overrides = __pop_subcomponent_overrides!(__overrides, "driver")
-  push!(__systems, @named driver = MyCar.CruiseController(; k=k, Ti=Ti, Td=Td, xd0=Float64(0), xi0=Float64(0), y_max=Float64(1), y_min=Float64(-1), driver_overrides...))
+  push!(__systems, @named driver = MyCar.CruiseController(; k=k, Ti=Ti, Td=Td, xd0=Float64(0), xi0=Float64(0), y_max=Float64(1), y_min=Float64(-1), __overrides = driver_overrides))
   # Subcomponent car of type MyCar.MappedCar
   car_overrides = __pop_subcomponent_overrides!(__overrides, "car")
-  push!(__systems, @named car = MyCar.MappedCar(; car_overrides...))
+  push!(__systems, @named car = MyCar.MappedCar(; __overrides = car_overrides))
   # Subcomponent pedal_part of type BlockComponents.Nonlinear.Limiter
   pedal_part_overrides = __pop_subcomponent_overrides!(__overrides, "pedal_part")
-  push!(__systems, @named pedal_part = BlockComponents.Nonlinear.Limiter(; y_min=Float64(0), y_max=Float64(1), pedal_part_overrides...))
+  push!(__systems, @named pedal_part = BlockComponents.Nonlinear.Limiter(; y_min=Float64(0), y_max=Float64(1), __overrides = pedal_part_overrides))
   # Subcomponent brake_part of type BlockComponents.Nonlinear.Limiter
   brake_part_overrides = __pop_subcomponent_overrides!(__overrides, "brake_part")
-  push!(__systems, @named brake_part = BlockComponents.Nonlinear.Limiter(; y_min=Float64(-1), y_max=Float64(0), brake_part_overrides...))
+  push!(__systems, @named brake_part = BlockComponents.Nonlinear.Limiter(; y_min=Float64(-1), y_max=Float64(0), __overrides = brake_part_overrides))
   # Subcomponent to_force of type BlockComponents.Math.Gain
   to_force_overrides = __pop_subcomponent_overrides!(__overrides, "to_force")
-  push!(__systems, @named to_force = BlockComponents.Math.Gain(; k=-F_brake_max, to_force_overrides...))
+  push!(__systems, @named to_force = BlockComponents.Math.Gain(; k=-F_brake_max, __overrides = to_force_overrides))
   # Subcomponent fuel_L of type BlockComponents.Continuous.Integrator
   fuel_L_overrides = __pop_subcomponent_overrides!(__overrides, "fuel_L")
-  push!(__systems, @named fuel_L = BlockComponents.Continuous.Integrator(; k=Float64(1 / 3600), x0=Float64(0), fuel_L_overrides...))
+  push!(__systems, @named fuel_L = BlockComponents.Continuous.Integrator(; k=Float64(1 / 3600), x0=Float64(0), __overrides = fuel_L_overrides))
   # Subcomponent dist_km of type BlockComponents.Continuous.Integrator
   dist_km_overrides = __pop_subcomponent_overrides!(__overrides, "dist_km")
-  push!(__systems, @named dist_km = BlockComponents.Continuous.Integrator(; k=Float64(1 / 3600), x0=Float64(0), dist_km_overrides...))
+  push!(__systems, @named dist_km = BlockComponents.Continuous.Integrator(; k=Float64(1 / 3600), x0=Float64(0), __overrides = dist_km_overrides))
 
   ### Check there are no unmatched overrides
-  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
+  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded. Override keys are dotted paths as written in Dyad source (e.g. inner.rate)."))
 
   ### Guesses
 
@@ -126,6 +132,6 @@ WLTC class 3b bench: the trace drives the cruise controller, the controller's ef
   push!(__eqs, connect(car.v_kmh, dist_km.u))
 
   # Return completely constructed System
-  return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
+  return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
 end
 export MappedCarWLTC

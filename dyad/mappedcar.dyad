@@ -23,7 +23,6 @@ component MappedCar
 relations
   connect(pedal, engine.pedal) {^id17}
   connect(pedal, driveline.pedal) {^id18}
-  connect(no_booster.y, engine.mdot_bst) {^id19}
   connect(engine.spline, flywheel.spline_a) {^id20}
   connect(flywheel.spline_b, driveline.spline)
   connect(engine.support, rot_ground.spline) {^id21}

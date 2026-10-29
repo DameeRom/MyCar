@@ -5,7 +5,7 @@
 
 
 @doc Markdown.doc"""
-   TireFrictionCurve(; name, sAdhesion, sSlide, mu_A, mu_S)
+   TireFrictionCurve(; name, sAdhesion, sSlide, mu_A, mu_S, __overrides)
 
 short TireFrictionCurve component description
 
@@ -30,7 +30,7 @@ short TireFrictionCurve component description
 | `slip`         | Slip magnitude                         | --  |
 | `mu_abs`         | Friction magnitude                         | --  |
 """
-@component function TireFrictionCurve(; name = nothing, sAdhesion=0.04, sSlide=0.12, mu_A=Float64(1), mu_S=0.7, kwargs...)
+@component function TireFrictionCurve(; name = nothing, var"sAdhesion"=0.04, var"sSlide"=0.12, var"mu_A"=Float64(1), var"mu_S"=0.7, __overrides = Dict{String, Any}())
   isnothing(name) && throw(ArgumentError("""
     The `name` keyword must be provided. Please consider using the `@named` macro,
     like so:
@@ -38,7 +38,7 @@ short TireFrictionCurve component description
     @named model = TireFrictionCurve()
   """))
 
-  __overrides = __build_overrides(kwargs)
+  __overrides = Dict{String, Any}(__overrides)
   __params = Symbolics.SymbolicT[]
   __vars = Symbolics.SymbolicT[]
   __systems = System[]
@@ -47,6 +47,12 @@ short TireFrictionCurve component description
   __initialization_eqs = Equation[]
   __eqs = Equation[]
   __bindings = Dict{Symbolics.SymbolicT, Symbolics.SymbolicT}()
+
+  ### Keyword argument overrides
+  haskey(__overrides, "sAdhesion") && (sAdhesion = pop!(__overrides, "sAdhesion"))
+  haskey(__overrides, "sSlide") && (sSlide = pop!(__overrides, "sSlide"))
+  haskey(__overrides, "mu_A") && (mu_A = pop!(__overrides, "mu_A"))
+  haskey(__overrides, "mu_S") && (mu_S = pop!(__overrides, "mu_S"))
 
   ### Structural Parameters (functions)
 
@@ -63,16 +69,16 @@ short TireFrictionCurve component description
   ### Symbolic Parameters
   __local__sAdhesion = sAdhesion
   append!(__params, @parameters (sAdhesion::Real), [description = "Slip ratio at peak adhesion"])
-  __initial_conditions[sAdhesion] = __local__sAdhesion
+  __dyad_seed_parameter!(__initial_conditions, __bindings, sAdhesion, __local__sAdhesion)
   __local__sSlide = sSlide
   append!(__params, @parameters (sSlide::Real), [description = "Slip ratio at the sliding plateau"])
-  __initial_conditions[sSlide] = __local__sSlide
+  __dyad_seed_parameter!(__initial_conditions, __bindings, sSlide, __local__sSlide)
   __local__mu_A = mu_A
   append!(__params, @parameters (mu_A::Real), [description = "Peak adhesion coefficient"])
-  __initial_conditions[mu_A] = __local__mu_A
+  __dyad_seed_parameter!(__initial_conditions, __bindings, mu_A, __local__mu_A)
   __local__mu_S = mu_S
   append!(__params, @parameters (mu_S::Real), [description = "Sliding friction coefficient"])
-  __initial_conditions[mu_S] = __local__mu_S
+  __dyad_seed_parameter!(__initial_conditions, __bindings, mu_S, __local__mu_S)
 
   ### Final Parameters (assignments)
 
@@ -86,11 +92,11 @@ short TireFrictionCurve component description
 
   ### Variables (assignments)
   __ovr_slip = pop!(__overrides, "slip", nothing); isnothing(__ovr_slip) || push!(__eqs, slip ~ __ovr_slip)
-  __ovr_slip__initial = pop!(__overrides, "slip__initial", nothing); isnothing(__ovr_slip__initial) || (__initial_conditions[slip] = __ovr_slip__initial)
-  __ovr_slip__guess = pop!(__overrides, "slip__guess", nothing)
+  __ovr_slip__initial = pop!(__overrides, "slip.initial", nothing); isnothing(__ovr_slip__initial) || (__initial_conditions[slip] = __ovr_slip__initial)
+  __ovr_slip__guess = pop!(__overrides, "slip.guess", nothing)
   __ovr_mu_abs = pop!(__overrides, "mu_abs", nothing); isnothing(__ovr_mu_abs) || push!(__eqs, mu_abs ~ __ovr_mu_abs)
-  __ovr_mu_abs__initial = pop!(__overrides, "mu_abs__initial", nothing); isnothing(__ovr_mu_abs__initial) || (__initial_conditions[mu_abs] = __ovr_mu_abs__initial)
-  __ovr_mu_abs__guess = pop!(__overrides, "mu_abs__guess", nothing)
+  __ovr_mu_abs__initial = pop!(__overrides, "mu_abs.initial", nothing); isnothing(__ovr_mu_abs__initial) || (__initial_conditions[mu_abs] = __ovr_mu_abs__initial)
+  __ovr_mu_abs__guess = pop!(__overrides, "mu_abs.guess", nothing)
 
   ### Constants
   __constants = Any[]
@@ -98,7 +104,7 @@ short TireFrictionCurve component description
   ### Components
 
   ### Check there are no unmatched overrides
-  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded."))
+  isempty(__overrides) || throw(ArgumentError("overrides: [$(join(keys(__overrides), ", "))] don't match names found in model. These names may exist in the model but could have been conditionally excluded. Override keys are dotted paths as written in Dyad source (e.g. inner.rate)."))
 
   ### Guesses
   isnothing(__ovr_slip__guess) || (__guesses[slip] = __ovr_slip__guess)
@@ -115,6 +121,6 @@ short TireFrictionCurve component description
   push!(__eqs, mu ~ sign(kappa) * mu_abs)
 
   # Return completely constructed System
-  return System(__eqs, t, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
+  return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
 end
 export TireFrictionCurve

@@ -5,7 +5,7 @@ component MapEngineDyno
   engine = MapEngine() {^engine}
   mounts = RotationalComponents.Components.Fixed() {^mounts}
   dyno = RotationalComponents.Sources.VelocitySource() {^dyno}
-  speed = BlockComponents.Sources.Ramp(offset = rpm * pi / 30, height = (800 - rpm) * pi / 30, start_time = 2, duration = 3)
+  speed = BlockComponents.Sources.Ramp(offset = rpm * pi / 30, height = (800 - rpm) * pi / 30, start_time = 2, duration = 3) {^speed}
   "Held engine speed [rpm]"
   parameter rpm::Real = 3080.0
   "Pedal before the step"
@@ -18,7 +18,6 @@ component MapEngineDyno
   parameter p_m0::Pressure = 47829.1
 relations
   connect(pedal.y, engine.pedal) {^id7}
-  connect(no_booster.y, engine.mdot_bst) {^id8}
   connect(speed.y, dyno.w_ref) {^id9}
   connect(engine.spline, dyno.spline) {^id10}
   connect(engine.support, mounts.spline) {^id11}
@@ -43,7 +42,7 @@ metadata {
       "Dyad": {"placement": {"diagram": {"x1": 850, "y1": 430, "x2": 950, "y2": 530}}}
     },
     "speed": {
-      "Dyad": {"placement": {"diagram": {"x1": 620, "y1": 430, "x2": 720, "y2": 530}}}
+      "Dyad": {"placement": {"diagram": {"x1": 640, "x2": 740, "y1": 430, "y2": 530}}}
     },
     "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
     "id8": {
@@ -52,7 +51,12 @@ metadata {
         "path": {}
       }
     },
-    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 810, "y": 460}, {"x": 810, "y": 480}], "E": 2}],
+        "path": {}
+      }
+    },
     "id10": {
       "Dyad": {
         "edges": [{"S": 1, "M": [{"x": 990, "y": 346}, {"x": 990, "y": 480}], "E": 2}],

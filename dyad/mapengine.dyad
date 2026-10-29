@@ -1,44 +1,49 @@
 "short MapEngine component description"
 component MapEngine
+  "Pedal, 0 released to 1 floored"
   pedal = RealInput() {^pedal}
-  mdot_bst = RealInput() {^mdot_bst}
+  "Vacuum take-off: the hose to the brake booster, at manifold pressure"
+  vacuum = VehicleSystemsComponents.Vehicle.GasPort() {^vacuum}
+  "Output shaft"
   spline = Spline() {^spline}
+  "Engine mounts"
   support = Spline() {^support}
+  "Manifold absolute pressure [Pa]"
   p_m = RealOutput() {^p_m}
+  "Fuel mass flow [kg/s]"
   mdot_fuel = RealOutput() {^mdot_fuel}
+  "CO2 mass flow [kg/s]"
   mdot_co2 = RealOutput() {^mdot_co2}
   air = VehicleSystemsComponents.Vehicle.Engine.AirPath() {^air}
   speed = RotationalComponents.Sensors.VelocitySensor() {^speed}
-  torque_map = VehicleSystemsComponents.Vehicle.Engine.CutTorqueMap() {^torque_map}
-  fuel_map = VehicleSystemsComponents.Vehicle.Engine.CutFuelMap() {^fuel_map}
-  cut_logic = VehicleSystemsComponents.Vehicle.Engine.FuelCutLogic() {^cut_logic}
+  torque_map = VehicleSystemsComponents.Vehicle.Engine.TorqueMap() {^torque_map}
+  fuel_map = VehicleSystemsComponents.Vehicle.Engine.FuelMap() {^fuel_map}
+  "CO2 per kilogram of petrol burned completely, 3.09 (textbook)"
   co2 = BlockComponents.Math.Gain(k = 3.09) {^co2}
   torque = RotationalComponents.Sources.TorqueSource() {^torque}
 relations
-  connect(pedal, air.u_thr) {^id15}
-  connect(mdot_bst, air.mdot_bst) {^id16}
-  connect(speed.w, fuel_map.omega, torque_map.omega) {^id17}
-  connect(speed.w, air.omega) {^id18}
-  connect(air.p_m, torque_map.p_m) {^id19}
-  connect(air.p_m, fuel_map.p_m) {^id20}
-  connect(air.p_m, p_m) {^id21}
-  connect(torque_map.y, torque.tau) {^id22}
-  connect(fuel_map.y, co2.u) {^id23}
-  connect(fuel_map.y, mdot_fuel) {^id24}
-  connect(co2.y, mdot_co2) {^id25}
-  connect(torque.support, support) {^id26}
-  connect(torque.spline, spline, speed.spline) {^id27}
-  connect(pedal, cut_logic.pedal) {^id28}
-  connect(speed.w, cut_logic.omega) {^id29}
-  connect(cut_logic.cut, fuel_map.cut) {^id30}
-  connect(cut_logic.cut, torque_map.cut) {^id31}
+  connect(pedal, air.u_thr) {^w01}
+  connect(vacuum, air.vacuum) {^w02}
+  connect(speed.w, air.omega) {^w03}
+  connect(speed.w, torque_map.omega) {^w04}
+  connect(speed.w, fuel_map.omega) {^w05}
+  connect(air.p_m, torque_map.p_m) {^w06}
+  connect(air.p_m, fuel_map.p_m) {^w07}
+  connect(air.p_m, p_m) {^w08}
+  connect(torque_map.y, torque.tau) {^w09}
+  connect(fuel_map.y, co2.u) {^w10}
+  connect(fuel_map.y, mdot_fuel) {^w11}
+  connect(co2.y, mdot_co2) {^w12}
+  connect(torque.spline, spline) {^w13}
+  connect(speed.spline, spline) {^w14}
+  connect(torque.support, support) {^w15}
 metadata {
   "_links": {
     "pedal": {
       "Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 100, "y2": 200}}}
     },
     "mdot_bst": {
-      "Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 310, "y2": 410}}}
+      "Dyad": {"placement": {"diagram": {"x1": -150, "x2": -50, "y1": 330, "y2": 430}}}
     },
     "spline": {
       "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 180, "y2": 280}}}

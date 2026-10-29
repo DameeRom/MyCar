@@ -23,7 +23,6 @@ component MappedCarWLTC
   parameter Td::Time = 0.7
   "Brake force at an effort of -1"
   parameter F_brake_max::Force = 4000
-  
 relations
   connect(trace.y, driver.u_s) {^id9}
   connect(car.v_kmh, driver.u_m) {^id10}
