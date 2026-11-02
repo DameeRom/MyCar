@@ -1,0 +1,69 @@
+"""
+Continuous set/reset latch that commits before it acts. Drop-in for
+`VehicleSystemsComponents.Vehicle.Engine.HysteresisLatch`.
+
+The memory `m` switches within `memory_time`; the output `y` relaxes only toward the committed
+state of `m`. In the library latch the output already cuts the engine while the memory is still
+undecided, so an engine creeping up to the threshold is pushed back under it and the latch slides
+on the threshold instead of latching.
+"""
+component HysteresisLatch
+  "Set request, 0 or 1"
+  set = RealInput() {^set}
+  "Reset request, 0 or 1"
+  reset = RealInput() {^reset}
+  "Latched fraction, 0 to 1"
+  y = RealOutput() {^y}
+  "Continuous output transition time"
+  parameter latch_time::Time(min = eps(Float64)) = 0.01
+  "Memory switching time, well below latch_time"
+  parameter memory_time::Time(min = eps(Float64)) = 0.001
+  "Latch memory, 0 or 1 once committed"
+  variable m::Real
+  variable request::Real
+relations
+  request = ifelse(m < 0.5, ifelse(set > 0.5, 1.0, 0.0), ifelse(reset > 0.5, 0.0, 1.0))
+  initial m = ifelse(set > 0.5, 1.0, 0.0)
+  der(m) = (request - m) / memory_time
+  initial y = ifelse(set > 0.5, 1.0, 0.0)
+  der(y) = (ifelse(m > 0.5, 1.0, 0.0) - y) / latch_time
+end
+
+"""
+Deceleration fuel-cut and rev-limiter logic, as `VehicleSystemsComponents.Vehicle.Engine.FuelCutLogic`
+but built from the local `HysteresisLatch`.
+"""
+component FuelCutLogic
+  "Driver pedal command, 0 closed to 1 fully open"
+  pedal = RealInput() {^pedal}
+  "Engine angular speed [rad/s]"
+  omega = RealInput() {^omega}
+  "Combined fuel-cut fraction, 0 fired to 1 cut"
+  cut = RealOutput() {^cut}
+  "Closed-pedal threshold for deceleration fuel cut"
+  parameter pedal_closed::Real = 1e-4
+  "Deceleration fuel-cut speed [rpm]"
+  parameter fuel_cut_rpm::Real = 1300.0
+  "Deceleration fuel-resume speed [rpm]"
+  parameter fuel_resume_rpm::Real = 1000.0
+  "Rev-limiter fuel-cut speed [rpm]"
+  parameter rev_cut_rpm::Real = 6500.0
+  "Rev-limiter fuel-resume speed [rpm]"
+  parameter rev_resume_rpm::Real = 6300.0
+  "Continuous latch transition time"
+  parameter latch_time::Time(min = eps(Float64)) = 0.01
+  decel = HysteresisLatch(latch_time = latch_time) {^decel}
+  rev = HysteresisLatch(latch_time = latch_time) {^rev}
+relations
+  decel.set = ifelse(pedal <= pedal_closed and omega * 30 / pi > fuel_cut_rpm, 1.0, 0.0)
+  decel.reset = ifelse(pedal > pedal_closed or omega * 30 / pi < fuel_resume_rpm, 1.0, 0.0)
+  rev.set = ifelse(omega * 30 / pi > rev_cut_rpm, 1.0, 0.0)
+  rev.reset = ifelse(omega * 30 / pi < rev_resume_rpm, 1.0, 0.0)
+  cut = min(max(decel.y + rev.y, 0.0), 1.0)
+metadata {
+  "_links": {
+    "decel": {"Dyad": {"placement": {"diagram": {"x1": 350, "y1": 300, "x2": 450, "y2": 400}}}},
+    "rev": {"Dyad": {"placement": {"diagram": {"x1": 350, "y1": 600, "x2": 450, "y2": 700}}}}
+  }
+}
+end

@@ -1,0 +1,65 @@
+"""
+Brake traction control: SlipABS turned round. Driving slip is positive, so the allowed wheel-circuit
+pressure builds while the predicted slip is past `lambda_target` and falls otherwise, between zero
+and the supply pressure.
+"""
+component BrakeTCS
+  "Wheel slip, positive while driving"
+  kappa = RealInput() {^kappa}
+  "Supply pressure, the upper bound of the command [Pa]"
+  demand = RealInput() {^demand}
+  "Allowed wheel-circuit pressure [Pa]"
+  p_cmd = RealOutput() {^p_cmd}
+  pressure = VehicleSystemsComponents.Vehicle.ABSPressureIntegrator(T_track = 0.01) {^pressure}
+  "Slip held, just past the tire's peak"
+  parameter lambda_target::Real = 0.04
+  "Pressure build rate [Pa/s]"
+  parameter k_inc::Real = 2.9e7
+  "Pressure dump rate [Pa/s]"
+  parameter k_dec::Real = 5.8e7
+  "Look-ahead, the brake's lag"
+  parameter T_p::Time = 0.03
+  "Slip-rate filter"
+  parameter T_f::Time = 0.003
+  variable kappa_f::Real
+  variable kappa_dot::Real
+  variable kappa_pred::Real
+relations
+  initial kappa_f = 0
+  der(kappa_f) = (kappa - kappa_f) / T_f
+  kappa_dot = (kappa - kappa_f) / T_f
+  kappa_pred = kappa + T_p * kappa_dot
+  connect(demand, pressure.demand) {^id1}
+  pressure.requested_rate = ifelse(kappa_pred > lambda_target, k_inc, -k_dec)
+  pressure.active = 1.0
+  connect(pressure.cmd, p_cmd) {^id2}
+metadata {
+  "_links": {
+    "kappa": {"Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 130, "y2": 230}}}},
+    "demand": {"Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 780, "y2": 880}}}},
+    "p_cmd": {"Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 440, "y2": 540}}}},
+    "pressure": {"Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 450, "y2": 550}}}},
+    "id1": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 300, "y": 830}, {"x": 300, "y": 475}], "E": 2}]}},
+    "id2": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}]}}
+  }
+}
+end
+
+"Slip pulse 0 -> 0.08 at 0.2 s, back to 0 at 0.6 s, against an 8.9 MPa supply"
+test component TestBrakeTCS
+  slip_up = BlockComponents.Sources.Step(height = 0.08, offset = 0.0, start_time = 0.2)
+  slip_down = BlockComponents.Sources.Step(height = -0.08, offset = 0.0, start_time = 0.6)
+  slip = BlockComponents.Math.Add()
+  supply = BlockComponents.Sources.Constant(k = 8.9e6)
+  tcs = BrakeTCS()
+relations
+  connect(slip_up.y, slip.u1)
+  connect(slip_down.y, slip.u2)
+  connect(slip.y, tcs.kappa)
+  connect(supply.y, tcs.demand)
+end
+
+analysis TestBrakeTCSTransient
+  extends TransientAnalysis(stop = 1.0, alg = ODEAlg.Tsit5(), dtmax = 1e-3)
+  model = TestBrakeTCS()
+end

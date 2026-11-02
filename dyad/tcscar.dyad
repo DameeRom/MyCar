@@ -1,0 +1,92 @@
+"""
+Traction-control plant: the mapped engine with fuel cut, flywheel, centrifugal clutch and CVT drive
+the hydraulic braked wheel, and the wheel drives the body. A pressure boundary feeds both ABS
+valves; it stands in for the pump and accumulator of a TCS unit. The engine sees the smaller of
+the driver's throttle and the TCS limit; the CVT schedule sees the driver's throttle.
+"""
+component TCSCar
+  "Driver's throttle, 0 released to 1 floored"
+  pedal = RealInput() {^pedal}
+  "TCS throttle limit, 0 to 1"
+  u_tcs = RealInput() {^u_tcs}
+  "Allowed wheel-circuit pressure [Pa]"
+  p_cmd = RealInput() {^p_cmd}
+  "Road-friction multiplier"
+  mu_scale = RealInput() {^mu_scale}
+  "Longitudinal tire slip, positive while driving"
+  kappa = RealOutput() {^kappa}
+  "Vehicle speed"
+  v = RealOutput() {^v}
+  throttle_limit = BlockComponents.Math.Min() {^throttle_limit}
+  engine = MapEngine() {^engine}
+  "Crankshaft and flywheel, J as MappedEngine assumes"
+  flywheel = RotationalComponents.Components.Inertia(J = 0.15) {^flywheel}
+  clutch = VehicleSystemsComponents.Vehicle.CentrifugalClutch() {^clutch}
+  variator = VehicleSystemsComponents.Vehicle.ControlledVariator() {^variator}
+  supply_command = BlockComponents.Sources.Constant(k = supply_pressure) {^supply_command}
+  "Pump and accumulator"
+  supply = HydraulicComponents.Sources.BoundaryPressure() {^supply}
+  valve_f = VehicleSystemsComponents.Vehicle.Brake.ABSValve() {^valve_f}
+  valve_r = VehicleSystemsComponents.Vehicle.Brake.ABSValve() {^valve_r}
+  line_f = VehicleSystemsComponents.Vehicle.Brake.BrakeLine() {^line_f}
+  line_r = VehicleSystemsComponents.Vehicle.Brake.BrakeLine(L = 4.0) {^line_r}
+  "Driven axle carries half the weight"
+  wheel = VehicleSystemsComponents.Vehicle.Wheel.HydraulicBrakedWheel(F_z = m * g / 2) {^wheel}
+  body = Body(m = m, g = g) {^body}
+  "Engine mounts, transmission housing and brake support"
+  housing = RotationalComponents.Components.Fixed() {^housing}
+  speed = TranslationalComponents.Sensors.VelocitySensor() {^speed}
+  path medium::HydraulicComponents.Interfaces.AbstractMedium = HydraulicComponents.IsothermalCompressible(bulk_modulus = 1.4e9, density = 1045.0, let_gas = false)
+  "Vehicle mass"
+  parameter m::Dyad.Mass = 1400
+  "Gravitational acceleration"
+  parameter g::Acceleration = 9.80665
+  "Pressure available from the pump and accumulator"
+  parameter supply_pressure::Pressure = 8.9e6
+relations
+  connect(pedal, throttle_limit.u1, variator.pedal) {^id1}
+  connect(u_tcs, throttle_limit.u2) {^id2}
+  connect(throttle_limit.y, engine.pedal) {^id3}
+  connect(engine.spline, flywheel.spline_a) {^id4}
+  connect(flywheel.spline_b, clutch.spline_a) {^id5}
+  connect(clutch.spline_b, variator.spline_a) {^id6}
+  connect(variator.spline_b, wheel.spline) {^id7}
+  connect(engine.support, clutch.support, variator.support, wheel.support, housing.spline) {^id8}
+  connect(supply_command.y, supply.p) {^id9}
+  connect(supply.port, valve_f.port_a, valve_r.port_a) {^id10}
+  connect(valve_f.port_b, line_f.port_a) {^id11}
+  connect(line_f.port_b, wheel.front) {^id12}
+  connect(valve_r.port_b, line_r.port_a) {^id13}
+  connect(line_r.port_b, wheel.rear) {^id14}
+  continuity(medium, supply.port.medium)
+  connect(p_cmd, valve_f.p_cmd, valve_r.p_cmd) {^id15}
+  connect(mu_scale, wheel.mu_scale) {^id16}
+  connect(wheel.flange, body.flange, speed.flange) {^id17}
+  connect(wheel.kappa, kappa) {^id18}
+  connect(speed.v, v) {^id19}
+metadata {
+  "_links": {
+    "pedal": {"Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 50, "y2": 150}}}},
+    "u_tcs": {"Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 220, "y2": 320}}}},
+    "p_cmd": {"Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 700, "y2": 800}}}},
+    "mu_scale": {"Dyad": {"placement": {"diagram": {"x1": 710, "x2": 810, "y1": 950, "y2": 1050}}}},
+    "kappa": {"Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 100, "y2": 200}}}},
+    "v": {"Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 450, "y2": 550}}}},
+    "throttle_limit": {"Dyad": {"placement": {"diagram": {"x1": 90, "x2": 170, "y1": 140, "y2": 220}}}},
+    "engine": {"Dyad": {"placement": {"diagram": {"x1": 210, "x2": 310, "y1": 120, "y2": 220}}}},
+    "flywheel": {"Dyad": {"placement": {"diagram": {"x1": 350, "x2": 430, "y1": 130, "y2": 210}}}},
+    "clutch": {"Dyad": {"placement": {"diagram": {"x1": 470, "x2": 550, "y1": 130, "y2": 210}}}},
+    "variator": {"Dyad": {"placement": {"diagram": {"x1": 590, "x2": 670, "y1": 130, "y2": 210}}}},
+    "housing": {"Dyad": {"placement": {"diagram": {"x1": 560, "x2": 620, "y1": 260, "y2": 320}}}},
+    "wheel": {"Dyad": {"placement": {"diagram": {"x1": 700, "x2": 820, "y1": 340, "y2": 460}}}},
+    "body": {"Dyad": {"placement": {"diagram": {"x1": 860, "x2": 940, "y1": 360, "y2": 440}}}},
+    "speed": {"Dyad": {"placement": {"diagram": {"x1": 860, "x2": 940, "y1": 470, "y2": 550}}}},
+    "supply_command": {"Dyad": {"placement": {"diagram": {"x1": 60, "x2": 140, "y1": 520, "y2": 600}}}},
+    "supply": {"Dyad": {"placement": {"diagram": {"x1": 180, "x2": 260, "y1": 520, "y2": 600}}}},
+    "valve_f": {"Dyad": {"placement": {"diagram": {"x1": 320, "x2": 400, "y1": 440, "y2": 520}}}},
+    "valve_r": {"Dyad": {"placement": {"diagram": {"x1": 320, "x2": 400, "y1": 610, "y2": 690}}}},
+    "line_f": {"Dyad": {"placement": {"diagram": {"x1": 480, "x2": 560, "y1": 440, "y2": 520}}}},
+    "line_r": {"Dyad": {"placement": {"diagram": {"x1": 480, "x2": 560, "y1": 610, "y2": 690}}}}
+  }
+}
+end

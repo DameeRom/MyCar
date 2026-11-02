@@ -16,8 +16,10 @@ component MapEngine
   mdot_co2 = RealOutput() {^mdot_co2}
   air = VehicleSystemsComponents.Vehicle.Engine.AirPath() {^air}
   speed = RotationalComponents.Sensors.VelocitySensor() {^speed}
-  torque_map = VehicleSystemsComponents.Vehicle.Engine.TorqueMap() {^torque_map}
-  fuel_map = VehicleSystemsComponents.Vehicle.Engine.FuelMap() {^fuel_map}
+  torque_map = VehicleSystemsComponents.Vehicle.Engine.CutTorqueMap() {^torque_map}
+  fuel_map = VehicleSystemsComponents.Vehicle.Engine.CutFuelMap() {^fuel_map}
+  "Fuel cut on overrun and at the rev limiter"
+  cut_logic = FuelCutLogic() {^cut_logic}
   "CO2 per kilogram of petrol burned completely, 3.09 (textbook)"
   co2 = BlockComponents.Math.Gain(k = 3.09) {^co2}
   torque = RotationalComponents.Sources.TorqueSource() {^torque}
@@ -37,6 +39,10 @@ relations
   connect(torque.spline, spline) {^w13}
   connect(speed.spline, spline) {^w14}
   connect(torque.support, support) {^w15}
+  connect(pedal, cut_logic.pedal) {^id28}
+  connect(speed.w, cut_logic.omega) {^id29}
+  connect(cut_logic.cut, fuel_map.cut) {^id30}
+  connect(cut_logic.cut, torque_map.cut) {^id31}
 metadata {
   "_links": {
     "pedal": {

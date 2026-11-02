@@ -1,0 +1,31 @@
+"short ABSStopTransient analysis description"
+analysis ABSStopTransient
+  extends Dyad.TransientAnalysis(stop = 6.0, alg = ODEAlg.Tsit5(), dtmax = 1e-3)
+  parameter road_mu::Real = 1.0
+  parameter T_p::Time = 0.03
+  parameter lambda_target::Real = 0.04
+  parameter pedal::Real = 0.6
+  model = MyCar.ABSStop(road_mu = road_mu, T_p = T_p, lambda_target = lambda_target, pedal = pedal)
+relations
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  }
+}
+end

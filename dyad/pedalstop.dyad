@@ -1,0 +1,172 @@
+"short PedalStop component description"
+component PedalStop
+  parameter pedal::Real = 0.6
+  parameter road_mu::Real = 1.0
+  command = BlockComponents.Sources.Step(height = pedal, start_time = 0.5) {^command}
+  pedal_unit = VehicleSystemsComponents.Vehicle.Brake.BrakePedal() {^pedal_unit}
+  booster = VehicleSystemsComponents.Vehicle.Brake.StaticBooster() {^booster}
+  master = VehicleSystemsComponents.Vehicle.Brake.TandemMasterCylinder() {^master}
+  line_f = VehicleSystemsComponents.Vehicle.Brake.BrakeLine() {^line_f}
+  line_r = VehicleSystemsComponents.Vehicle.Brake.BrakeLine(L = 4) {^line_r}
+  wheel = VehicleSystemsComponents.Vehicle.Wheel.HydraulicBrakedWheel() {^wheel}
+  body = MyCar.Body() {^body}
+  fixed_hydraulic = TranslationalComponents.Components.Fixed() {^fixed_hydraulic}
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  speed = TranslationalComponents.Sensors.VelocitySensor() {^speed}
+  road = BlockComponents.Sources.Constant(k = road_mu) {^road}
+  "Brake fluid"
+  path medium::HydraulicComponents.Interfaces.AbstractMedium = HydraulicComponents.IsothermalCompressible(bulk_modulus = 1.4e9, density = 1045.0, let_gas = false)
+relations
+  continuity(medium, master.front.medium)
+  connect(command.y, pedal_unit.u) {^id13}
+  connect(pedal_unit.rod, booster.input) {^id14}
+  connect(booster.rod_out, master.pushrod) {^id15}
+  connect(booster.support, fixed_hydraulic.flange, pedal_unit.support, master.support) {^id16}
+  connect(master.rear, line_r.port_a) {^id17}
+  connect(master.front, line_f.port_a) {^id18}
+  connect(wheel.rear, line_r.port_b) {^id19}
+  connect(line_f.port_b, wheel.front) {^id20}
+  connect(fixed.spline, wheel.support) {^id21}
+  connect(road.y, wheel.mu_scale) {^id22}
+  connect(wheel.flange, body.flange, speed.flange) {^id23}
+  initial wheel.inertia.phi = 0
+  initial wheel.inertia.w = 25 / 0.31
+  initial body.mass.s = 0
+  initial body.mass.v = 25
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "command": {
+      "Dyad": {"placement": {"diagram": {"x1": -160, "x2": -60, "y1": 450, "y2": 550}}}
+    },
+    "pedal_unit": {
+      "Dyad": {"placement": {"diagram": {"x1": 30, "x2": 130, "y1": 450, "y2": 550}}}
+    },
+    "booster": {
+      "Dyad": {"placement": {"diagram": {"x1": 210, "x2": 310, "y1": 450, "y2": 550}}}
+    },
+    "master": {
+      "Dyad": {"placement": {"diagram": {"x1": 350, "x2": 450, "y1": 450, "y2": 550}}}
+    },
+    "line_f": {
+      "Dyad": {"placement": {"diagram": {"x1": 490, "x2": 590, "y1": 330, "y2": 430}}}
+    },
+    "line_r": {
+      "Dyad": {"placement": {"diagram": {"x1": 490, "x2": 590, "y1": 540, "y2": 640}}}
+    },
+    "wheel": {
+      "Dyad": {"placement": {"diagram": {"x1": 680, "x2": 780, "y1": 440, "y2": 540}}}
+    },
+    "body": {
+      "Dyad": {"placement": {"diagram": {"x1": 890, "x2": 990, "y1": 510, "y2": 610}}}
+    },
+    "fixed_hydraulic": {
+      "Dyad": {"placement": {"diagram": {"x1": 210, "x2": 310, "y1": 630, "y2": 730}}}
+    },
+    "fixed": {
+      "Dyad": {"placement": {"diagram": {"x1": 680, "x2": 780, "y1": 650, "y2": 750}}}
+    },
+    "speed": {
+      "Dyad": {"placement": {"diagram": {"x1": 890, "x2": 990, "y1": 300, "y2": 400}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 550, "x2": 650, "y1": 770, "y2": 870}}}
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": 3, "M": [{"x": 80, "y": 580}], "E": -1},
+          {"S": 4, "M": [{"x": 400, "y": 580}], "E": -1}
+        ],
+        "junctions": [{"x": 260, "y": 580}],
+        "path": {}
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 470, "y": 525}, {"x": 470, "y": 590}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 470, "y": 475}, {"x": 470, "y": 380}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 745, "y": 420}, {"x": 630, "y": 420}, {"x": 630, "y": 590}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [{"x": 715, "y": 380}], "E": 2}], "path": {}}},
+    "id21": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id22": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 780, "y": 820}, {"x": 780, "y": 580}, {"x": 760, "y": 580}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 860, "y": 490},
+              {"x": 860, "y": 660},
+              {"x": 1040, "y": 660},
+              {"x": 1040, "y": 560}
+            ],
+            "E": -1
+          },
+          {"S": -1, "M": [], "E": 2},
+          {
+            "S": 3,
+            "M": [{"x": 880, "y": 350}, {"x": 880, "y": 300}, {"x": 1040, "y": 300}],
+            "E": -1
+          }
+        ],
+        "junctions": [{"x": 1040, "y": 560}],
+        "path": {}
+      }
+    }
+  }
+}
+end

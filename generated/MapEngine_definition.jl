@@ -81,12 +81,15 @@ unconnected carries no flow: a capped hose. ([`GasPort`](@ref))
   # Subcomponent speed of type RotationalComponents.Sensors.VelocitySensor
   speed_overrides = __pop_subcomponent_overrides!(__overrides, "speed")
   push!(__systems, @named speed = RotationalComponents.Sensors.VelocitySensor(; __overrides = speed_overrides))
-  # Subcomponent torque_map of type VehicleSystemsComponents.Vehicle.Engine.TorqueMap
+  # Subcomponent torque_map of type VehicleSystemsComponents.Vehicle.Engine.CutTorqueMap
   torque_map_overrides = __pop_subcomponent_overrides!(__overrides, "torque_map")
-  push!(__systems, @named torque_map = VehicleSystemsComponents.Vehicle.Engine.TorqueMap(; __overrides = torque_map_overrides))
-  # Subcomponent fuel_map of type VehicleSystemsComponents.Vehicle.Engine.FuelMap
+  push!(__systems, @named torque_map = VehicleSystemsComponents.Vehicle.Engine.CutTorqueMap(; __overrides = torque_map_overrides))
+  # Subcomponent fuel_map of type VehicleSystemsComponents.Vehicle.Engine.CutFuelMap
   fuel_map_overrides = __pop_subcomponent_overrides!(__overrides, "fuel_map")
-  push!(__systems, @named fuel_map = VehicleSystemsComponents.Vehicle.Engine.FuelMap(; __overrides = fuel_map_overrides))
+  push!(__systems, @named fuel_map = VehicleSystemsComponents.Vehicle.Engine.CutFuelMap(; __overrides = fuel_map_overrides))
+  # Subcomponent cut_logic of type MyCar.FuelCutLogic
+  cut_logic_overrides = __pop_subcomponent_overrides!(__overrides, "cut_logic")
+  push!(__systems, @named cut_logic = MyCar.FuelCutLogic(; __overrides = cut_logic_overrides))
   # Subcomponent co2 of type BlockComponents.Math.Gain
   co2_overrides = __pop_subcomponent_overrides!(__overrides, "co2")
   push!(__systems, @named co2 = BlockComponents.Math.Gain(; k=3.09, __overrides = co2_overrides))
@@ -120,6 +123,10 @@ unconnected carries no flow: a capped hose. ([`GasPort`](@ref))
   push!(__eqs, connect(torque.spline, spline))
   push!(__eqs, connect(speed.spline, spline))
   push!(__eqs, connect(torque.support, support))
+  push!(__eqs, connect(pedal, cut_logic.pedal))
+  push!(__eqs, connect(speed.w, cut_logic.omega))
+  push!(__eqs, connect(cut_logic.cut, fuel_map.cut))
+  push!(__eqs, connect(cut_logic.cut, torque_map.cut))
 
   # Return completely constructed System
   return System(__eqs, ModelingToolkit.t_nounits, __vars, __params; systems=__systems, initial_conditions=__initial_conditions, guesses=__guesses, name, initialization_eqs=__initialization_eqs, bindings=__bindings, assertions=__assertions)
