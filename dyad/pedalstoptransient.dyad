@@ -1,0 +1,29 @@
+"short PedalStopTransient analysis description"
+analysis PedalStopTransient
+  extends Dyad.TransientAnalysis(stop = 6.0, alg = ODEAlg.Tsit5(), dtmax = 1e-3)
+  parameter pedal::Real = 0.6
+  parameter road_mu::Real = 1.0
+  model = MyCar.PedalStop(pedal = pedal, road_mu = road_mu)
+relations
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  }
+}
+end

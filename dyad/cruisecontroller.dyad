@@ -1,0 +1,246 @@
+"short CruiseController component description"
+component CruiseController
+  "Setpoint in km/h"
+  u_s = RealInput() {^u_s}
+  "Measured speed in km/h"
+  u_m = RealInput() {^u_m}
+  "Torque command in N·m"
+  y = RealOutput() {^y}
+  error = BlockComponents.Math.Add(k1 = 1, k2 = -1) {^error}
+  add_d = BlockComponents.Math.Add(k1 = wd, k2 = -1) {^add_d}
+  derivative = BlockComponents.Continuous.Derivative(k = Td, T = Td / Nd, x0 = xd0) {^derivative}
+  integrator = BlockComponents.Continuous.Integrator(k = 1 / Ti, x0 = xi0) {^integrator}
+  add_pid = BlockComponents.Math.Add3(k1 = 1, k2 = 1, k3 = 1) {^add_pid}
+  gain = BlockComponents.Math.Gain(k = k) {^gain}
+  limiter = BlockComponents.Nonlinear.Limiter(y_max = y_max, y_min = y_min) {^limiter}
+  excess = BlockComponents.Math.Add(k2 = -1) {^excess}
+  push = BlockComponents.Math.Product() {^push}
+  winding = BlockComponents.Logical.GreaterThreshold() {^winding}
+  zero = BlockComponents.Sources.Constant(k = 0) {^zero}
+  gate = BlockComponents.Logical.Switch() {^gate}
+  "Controller gain in N·m per km/h"
+  parameter k::Real = 56
+  "Integral time"
+  parameter Ti::Time = 10
+  "Initial integrator state"
+  parameter xi0::Real = 0
+  "Derivative time"
+  parameter Td::Time = 0.5
+  "Derivative filter: the filter time constant is Td / Nd"
+  parameter Nd::Real = 10
+  "Setpoint weight in the derivative"
+  parameter wd::Real = 0
+  "Initial derivative-filter state, (wd - 1) * 90"
+  parameter xd0::Real = -90
+  "Output ceiling; no limit unless one is set"
+  parameter y_max::Real = 1e300
+  "Output floor"
+  parameter y_min::Real = -y_max
+relations
+  connect(u_s, error.u1, add_d.u1) {^id16}
+  connect(error.y, add_pid.u1) {^id17}
+  connect(add_d.y, derivative.u) {^id18}
+  connect(add_pid.y, gain.u) {^id19}
+  connect(gain.y, limiter.u) {^id20}
+  connect(integrator.y, add_pid.u3) {^id21}
+  connect(derivative.y, add_pid.u2) {^id22}
+  connect(add_d.u2, u_m, error.u2) {^id23}
+  connect(limiter.y, y, excess.u2) {^id24}
+  connect(excess.y, push.u1) {^id25}
+  connect(push.y, winding.u) {^id26}
+  connect(gate.y, integrator.u) {^id27}
+  connect(winding.y, gate.u2) {^id28}
+  connect(push.u2, gate.u3) {^id29}
+  connect(excess.u1, gain.y) {^id30}
+  connect(zero.y, gate.u1) {^id31}
+  connect(error.y, push.u2) {^id32}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "u_s": {
+      "Dyad": {"placement": {"diagram": {"x1": -30, "x2": 50, "y1": 290, "y2": 370}}}
+    },
+    "u_m": {
+      "Dyad": {
+        "placement": {"diagram": {"x1": 130, "x2": 210, "y1": 950, "y2": 1030, "rot": 270}}
+      }
+    },
+    "y": {
+      "Dyad": {"placement": {"diagram": {"x1": 1070, "x2": 1150, "y1": 460, "y2": 540}}}
+    },
+    "error": {
+      "Dyad": {"placement": {"diagram": {"x1": 190, "x2": 290, "y1": 310, "y2": 410}}}
+    },
+    "add_d": {
+      "Dyad": {"placement": {"diagram": {"x1": 310, "x2": 410, "y1": 840, "y2": 940}}}
+    },
+    "derivative": {
+      "Dyad": {"placement": {"diagram": {"x1": 460, "x2": 560, "y1": 840, "y2": 940}}}
+    },
+    "integrator": {
+      "Dyad": {"placement": {"diagram": {"x1": 470, "x2": 570, "y1": 520, "y2": 620}}}
+    },
+    "add_pid": {
+      "Dyad": {"placement": {"diagram": {"x1": 630, "x2": 730, "y1": 340, "y2": 440}}}
+    },
+    "gain": {
+      "Dyad": {"placement": {"diagram": {"x1": 760, "x2": 860, "y1": 340, "y2": 440}}}
+    },
+    "limiter": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 340, "y2": 440}}}
+    },
+    "excess": {
+      "Dyad": {"placement": {"diagram": {"x1": 320, "x2": 420, "y1": 110, "y2": 210}}}
+    },
+    "push": {
+      "Dyad": {"placement": {"diagram": {"x1": 530, "x2": 630, "y1": 140, "y2": 240}}}
+    },
+    "winding": {
+      "Dyad": {"placement": {"diagram": {"x1": 750, "x2": 850, "y1": 140, "y2": 240}}}
+    },
+    "zero": {
+      "Dyad": {"placement": {"diagram": {"x1": 220, "x2": 270, "y1": 510, "y2": 560}}}
+    },
+    "gate": {
+      "Dyad": {"placement": {"diagram": {"x1": 330, "x2": 430, "y1": 520, "y2": 620}}}
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": 3, "M": [{"x": 120, "y": 860}], "E": -1}
+        ],
+        "junctions": [{"x": 120, "y": 330}],
+        "path": {}
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id18": {},
+    "id19": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 590, "y": 570}, {"x": 590, "y": 420}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 600, "y": 890}, {"x": 600, "y": 390}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 170, "y": 920}], "E": 2},
+          {"S": 3, "M": [{"x": 170, "y": 390}], "E": -1}
+        ],
+        "junctions": [{"x": 170, "y": 920}],
+        "path": {}
+      }
+    },
+    "id24": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 1110, "y": 390}], "E": 2},
+          {
+            "S": 3,
+            "M": [{"x": 230, "y": 190}, {"x": 230, "y": 0}, {"x": 1100, "y": 0}],
+            "E": -1
+          }
+        ],
+        "junctions": [{"x": 1100, "y": 390}],
+        "path": {}
+      }
+    },
+    "id25": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id26": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id27": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id28": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 870, "y": 190},
+              {"x": 870, "y": 300},
+              {"x": 310, "y": 300},
+              {"x": 310, "y": 570}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id29": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 485, "y": 220},
+              {"x": 485, "y": 250},
+              {"x": 300, "y": 250},
+              {"x": 300, "y": 602}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id30": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 290, "y": 130},
+              {"x": 290, "y": 60},
+              {"x": 900, "y": 60},
+              {"x": 900, "y": 390}
+            ],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id31": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 303.75, "y": 535}, {"x": 303.75, "y": 538}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id32": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 470, "y": 360}, {"x": 470, "y": 215}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

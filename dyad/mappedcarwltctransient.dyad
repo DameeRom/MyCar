@@ -1,0 +1,27 @@
+"Run the WLTC class 3b bench; stop = 589 is the low phase, stop = 1800 the whole cycle"
+analysis MappedCarWLTCTransient
+  extends Dyad.TransientAnalysis(stop = 1800, saveat = 1, alg = ODEAlg.Rodas5P())
+  model = MyCar.MappedCarWLTC()
+relations
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  }
+}
+end

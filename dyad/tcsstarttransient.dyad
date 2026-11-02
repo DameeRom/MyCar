@@ -1,0 +1,7 @@
+"Standing start on snow; set brake_enabled / engine_enabled to 0 or 1 for the four cases"
+analysis TCSStartTransient
+  extends Dyad.TransientAnalysis(stop = 10.0, alg = ODEAlg.Tsit5(), dtmax = 1e-3)
+  parameter brake_enabled::Real = 1.0
+  parameter engine_enabled::Real = 1.0
+  model = MyCar.TCSStart(brake_enabled = brake_enabled, engine_enabled = engine_enabled)
+end

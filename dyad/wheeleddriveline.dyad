@@ -1,0 +1,72 @@
+"short Driveline component description"
+component WheeledDriveline
+  "From the engine"
+  spline = Dyad.Spline() {^spline}
+  "Gearbox housing"
+  support_r = Dyad.Spline() {^support_r}
+  "To the body"
+  flange = Dyad.Flange() {^flange}
+  "Road"
+  support_t = Dyad.Flange() {^support_t}
+  gear = RotationalComponents.Components.IdealGear(ratio = i) {^gear}
+  wheel = RotationalComponents.Components.IdealRollingWheel(radius = r) {^wheel}
+  inertia = RotationalComponents.Components.Inertia(J = J_w) {^inertia}
+  "Gear ratio"
+  parameter i::Real = 4.0
+  "Wheel rolling radius"
+  parameter r::Dyad.Length = 0.31
+  "Road wheel and tire inertia"
+  parameter J_w::MomentOfInertia() = 1.0
+relations
+  connect(spline, gear.spline_a) {^id8}
+  connect(wheel.flange, flange) {^id9}
+  connect(gear.support, support_r) {^id10}
+  connect(wheel.support_r, support_r) {^id11}
+  connect(wheel.support_t, support_t) {^id12}
+  connect(gear.spline_b, inertia.spline_a) {^id13}
+  connect(inertia.spline_b, wheel.spline) {^id14}
+metadata {
+  "_links": {
+    "spline": {
+      "Dyad": {"placement": {"diagram": {"x1": -50, "x2": 50, "y1": 450, "y2": 550}}}
+    },
+    "support_r": {
+      "Dyad": {"placement": {"diagram": {"x1": 330, "x2": 430, "y1": 950, "y2": 1050}}}
+    },
+    "flange": {
+      "Dyad": {"placement": {"diagram": {"x1": 950, "x2": 1050, "y1": 450, "y2": 550}}}
+    },
+    "support_t": {
+      "Dyad": {"placement": {"diagram": {"x1": 560, "x2": 660, "y1": 950, "y2": 1050}}}
+    },
+    "gear": {
+      "Dyad": {"placement": {"diagram": {"x1": 250, "x2": 350, "y1": 450, "y2": 550}}}
+    },
+    "wheel": {
+      "Dyad": {"placement": {"diagram": {"x1": 620, "x2": 720, "y1": 450, "y2": 550}}}
+    },
+    "inertia": {
+      "Dyad": {"placement": {"diagram": {"x1": 440, "x2": 540, "y1": 450, "y2": 550}}}
+    },
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 300, "y": 800}, {"x": 380, "y": 800}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 635, "y": 800}, {"x": 380, "y": 800}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id12": {
+      "Dyad": {"edges": [{"S": 1, "M": [{"x": 705, "y": 1000}], "E": 2}], "path": {}}
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "path": {}}}
+  }
+}
+end

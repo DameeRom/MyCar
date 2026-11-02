@@ -1,0 +1,75 @@
+"short CruiseLoopStep component description"
+component CruiseLoopStep
+  demand = BlockComponents.Sources.Step(offset = 90, height = 20, start_time = 0) {^demand}
+  controller = MyCar.CruiseController(y_max = 150, y_min = 0) {^controller}
+  plant = MyCar.GradeCar() {^plant}
+  road = BlockComponents.Sources.Constant(k = 0) {^road}
+relations
+  connect(controller.y, plant.tau_cmd) {^id5}
+  initial plant.body.mass.s = 0
+  initial plant.body.mass.v = 25
+  initial plant.engine.lag.x = 31.078
+  connect(plant.v_kmh, controller.u_m) {^id6}
+  connect(plant.grade, road.y) {^id7}
+  connect(demand.y, controller.u_s) {^id8}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true},
+    "deprecated": null,
+    "panel": {}
+  },
+  "_links": {
+    "demand": {
+      "Dyad": {"placement": {"diagram": {"x1": 130, "x2": 230, "y1": 210, "y2": 310}}}
+    },
+    "controller": {
+      "Dyad": {"placement": {"diagram": {"x1": 360, "x2": 460, "y1": 220, "y2": 320}}}
+    },
+    "plant": {
+      "Dyad": {"placement": {"diagram": {"x1": 650, "x2": 750, "y1": 220, "y2": 320}}}
+    },
+    "road": {
+      "Dyad": {"placement": {"diagram": {"x1": 360, "x2": 460, "y1": 500, "y2": 600}}}
+    },
+    "id5": {},
+    "id6": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 820, "y": 270}, {"x": 820, "y": 430}, {"x": 377, "y": 430}],
+            "E": 2
+          }
+        ],
+        "path": {}
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 557.5, "y": 311}, {"x": 557.5, "y": 550}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 298, "y": 260}, {"x": 298, "y": 253}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

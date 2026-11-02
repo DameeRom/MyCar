@@ -1,0 +1,49 @@
+"short MappedCarCruise component description"
+component MappedCarCoast
+  pedal = BlockComponents.Sources.Step(height = -pedal_cmd, offset = pedal_cmd, start_time = 5) {^pedal}
+  "Wheel radius 0.31 m"
+  car = MyCar.MappedCar(ratio_initial = rpm0 * pi / 30 * 0.31 / (speed_kmh / 3.6)) {^car}
+  "Initial road speed [km/h]"
+  parameter speed_kmh::Real = 90
+  "Pedal that holds speed_kmh"
+  parameter pedal_cmd::Real = 0.0916
+  "Initial engine speed [rpm], steady at pedal_cmd"
+  parameter rpm0::Real = 2182
+  "Initial manifold pressure, steady at pedal_cmd"
+  parameter p_m0::Dyad.Pressure = 54420
+  brake_cmd = BlockComponents.Sources.Step(height = 4000, start_time = 5) {^brake_cmd}
+relations
+  initial car.body.mass.s = 0
+  initial car.body.mass.v = speed_kmh / 3.6
+  initial car.flywheel.w = rpm0 * pi / 30
+  initial car.flywheel.phi = 0
+  initial car.driveline.clutch.spline_b.phi = 0
+  initial car.engine.air.manifold.p = p_m0
+  connect(pedal.y, car.pedal) {^id4}
+  connect(brake_cmd.y, car.F_break) {^id5}
+metadata {
+  "_links": {
+    "pedal": {
+      "Dyad": {"placement": {"diagram": {"x1": 110, "x2": 210, "y1": 450, "y2": 550}}}
+    },
+    "car": {
+      "Dyad": {"placement": {"diagram": {"x1": 500, "y1": 420, "x2": 700, "y2": 620}}}
+    },
+    "brake_cmd": {
+      "Dyad": {"placement": {"diagram": {"x1": 120, "x2": 220, "y1": 680, "y2": 780}}}
+    },
+    "id4": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 357.5, "y": 500}, {"x": 357.5, "y": 494}], "E": 2}],
+        "path": {}
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 265, "y": 730}, {"x": 265, "y": 620}], "E": 2}],
+        "path": {}
+      }
+    }
+  }
+}
+end

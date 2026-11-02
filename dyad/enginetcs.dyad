@@ -1,0 +1,58 @@
+"""
+Engine traction control: the same law as BrakeTCS on a throttle limit between 0 and 1. The limit
+falls while the predicted slip is past `lambda_target` and recovers below it. The integrator tracks
+the throttle cut (it starts at zero), and the limit is one minus the cut.
+"""
+component EngineTCS
+  "Wheel slip, positive while driving"
+  kappa = RealInput() {^kappa}
+  "Throttle limit, 0 to 1"
+  u_lim = RealOutput() {^u_lim}
+  cut = VehicleSystemsComponents.Vehicle.ABSPressureIntegrator(T_track = 0.01) {^cut}
+  "Slip held, just past the tire's peak"
+  parameter lambda_target::Real = 0.04
+  "Throttle-limit reduction rate [1/s]"
+  parameter k_dec::Real = 18.0
+  "Throttle-limit recovery rate [1/s]"
+  parameter k_inc::Real = 10.0
+  "Look-ahead, the manifold and torque lag"
+  parameter T_p::Time = 0.3
+  "Slip-rate filter"
+  parameter T_f::Time = 0.003
+  variable kappa_f::Real
+  variable kappa_dot::Real
+  variable kappa_pred::Real
+relations
+  initial kappa_f = 0
+  der(kappa_f) = (kappa - kappa_f) / T_f
+  kappa_dot = (kappa - kappa_f) / T_f
+  kappa_pred = kappa + T_p * kappa_dot
+  cut.demand = 1.0
+  cut.requested_rate = ifelse(kappa_pred > lambda_target, k_dec, -k_inc)
+  cut.active = 1.0
+  u_lim = 1.0 - cut.cmd
+metadata {
+  "_links": {
+    "kappa": {"Dyad": {"placement": {"diagram": {"x1": -40, "x2": 60, "y1": 450, "y2": 550}}}},
+    "u_lim": {"Dyad": {"placement": {"diagram": {"x1": 960, "x2": 1060, "y1": 450, "y2": 550}}}},
+    "cut": {"Dyad": {"placement": {"diagram": {"x1": 450, "x2": 550, "y1": 450, "y2": 550}}}}
+  }
+}
+end
+
+"Slip pulse 0 -> 0.08 at 0.2 s, back to 0 at 0.6 s"
+test component TestEngineTCS
+  slip_up = BlockComponents.Sources.Step(height = 0.08, offset = 0.0, start_time = 0.2)
+  slip_down = BlockComponents.Sources.Step(height = -0.08, offset = 0.0, start_time = 0.6)
+  slip = BlockComponents.Math.Add()
+  tcs = EngineTCS()
+relations
+  connect(slip_up.y, slip.u1)
+  connect(slip_down.y, slip.u2)
+  connect(slip.y, tcs.kappa)
+end
+
+analysis TestEngineTCSTransient
+  extends TransientAnalysis(stop = 1.0, alg = ODEAlg.Tsit5(), dtmax = 1e-3)
+  model = TestEngineTCS()
+end
